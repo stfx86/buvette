@@ -1,9 +1,10 @@
+package db;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 //
-public class App {
-    public static void main(String[] args) {
+public class DBConnection {
+    public void CheckConnection (){
         String url = "jdbc:mariadb://localhost:3306/buvette";
         String user = "stof";
         String password = "bennasser";
@@ -18,3 +19,4 @@ public class App {
         }
     }
 }
+
