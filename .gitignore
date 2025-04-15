@@ -1,3 +1,30 @@
+# Ignore build output
 /bin/
-./.vscode
-./lib/
+out/
+build/
+
+# Ignore IDE settings
+.vscode/
+.idea/
+
+# Ignore compiled classes
+*.class
+
+# Ignore dependency libraries (if you’re not committing jars)
+lib/
+
+# Ignore OS files
+.DS_Store
+Thumbs.db
+
+# Ignore logs
+*.log
+
+# Ignore configuration backups or temporary files
+*.bak
+*.tmp
+*.swp
+
+# Ignore environment files (if any)
+.env
+config.properties
