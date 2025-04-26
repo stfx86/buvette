@@ -1,0 +1,17 @@
+# NetBeans private settings (personal to your computer)
+nbproject/private/
+
+# Build outputs (generated when you build the project)
+build/
+dist/
+
+# Java compiled files
+*.class
+
+# OS-specific junk files
+.DS_Store
+Thumbs.db
+
+# Logs, temporary files
+*.log
+
