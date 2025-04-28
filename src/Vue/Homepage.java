@@ -68,22 +68,22 @@ public class Homepage extends JFrame {
 
         menuData.put("Pizzas", Arrays.asList(
             new Plat("Pizza Margherita", "30 DH", "Classic pizza with tomato, mozzarella, and basil.", "src/images/pizza1.jpeg"),
-            new Plat("Pizza Pepperoni", "40 DH", "Spicy pepperoni with mozzarella and tomato sauce.", "src/images/pizza2.jpg")
+            new Plat("Pizza Pepperoni", "40 DH", "Spicy pepperoni with mozzarella and tomato sauce.", "src/images/pizza2.jpeg")
         ));
 
         menuData.put("Burgers", Arrays.asList(
-            new Plat("Cheeseburger", "35 DH", "Beef patty with cheddar, lettuce, and tomato.", "src/images/burger1.jpg"),
-            new Plat("Bacon Burger", "38 DH", "Beef patty with crispy bacon and BBQ sauce.", "src/images/burger2.jpg")
+            new Plat("Cheeseburger", "35 DH", "Beef patty with cheddar, lettuce, and tomato.", "src/images/burger1.jpeg"),
+            new Plat("Bacon Burger", "38 DH", "Beef patty with crispy bacon and BBQ sauce.", "src/images/burger2.jpeg")
         ));
 
         menuData.put("Desserts", Arrays.asList(
-            new Plat("Tiramisu", "25 DH", "Coffee-flavored Italian dessert with mascarpone.", "src/images/dessert1.jpg"),
-            new Plat("Crème Brûlée", "28 DH", "Rich custard with a caramelized sugar crust.", "src/images/dessert2.jpg")
+            new Plat("Tiramisu", "25 DH", "Coffee-flavored Italian dessert with mascarpone.", "src/images/dessert1.jpeg"),
+            new Plat("Crème Brûlée", "28 DH", "Rich custard with a caramelized sugar crust.", "src/images/dessert2.jpeg")
         ));
 
         menuData.put("Drinks", Arrays.asList(
-            new Plat("Coca-Cola", "10 DH", "Refreshing carbonated soft drink.", "src/images/drink1.jpg"),
-            new Plat("Orange Juice", "12 DH", "Freshly squeezed orange juice.", "src/images/drink2.jpg")
+            new Plat("Coca-Cola", "10 DH", "Refreshing carbonated soft drink.", "src/images/drink1.jpeg"),
+            new Plat("Orange Juice", "12 DH", "Freshly squeezed orange juice.", "src/images/drink2.jpeg")
         ));
     }
 
