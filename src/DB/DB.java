@@ -17,6 +17,14 @@ public class DB {
     }
 
     private static void loadEnv() {
+/////////  file name : .env   ////////////////////////////
+// EX:                                     /             /                
+//                                                       /
+//        jdbc:mariadb://localhost:3306/buvette          /
+//        stof                                           / 
+//        bennasser                                      /  
+//                                                       /
+////////////////////////////////////////////////////////// duro .env dyalkon hda DB.java 
         try (BufferedReader reader = new BufferedReader(new FileReader("src/DB/.env"))) {
             URL = reader.readLine();
             USER = reader.readLine();
@@ -46,6 +54,31 @@ public class DB {
 }
 
         ////////////////////////////////////////////////////////////////////
+    
+        public static boolean verifyUser(String name, String password) {
+        String sql = "SELECT * FROM buvette.users WHERE name = ? AND password = ?";
+        try (Connection conn = connect(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, name);
+            stmt.setString(2, password);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    // User exists with matching password
+                    return true;
+                } else {
+                    // No user found or wrong password
+                    return false;
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("Error verifying user:");
+            e.printStackTrace();
+            return false;
+        }
+    }
+        
+        
+        ////////////////////////////////////////////////////////////////////
+
 
     
     

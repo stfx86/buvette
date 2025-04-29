@@ -4,6 +4,7 @@
  */
 package buvette;
 import DB.DB;
+import Vue.*;
 /**
  *
  * @author stof
@@ -15,6 +16,8 @@ public class Buvette {
     public static void main(String[] args) {
         
         DB.testConnection();
+        SignIn sinIn = new SignIn();
+        sinIn.setVisible(true);
         
         
         
