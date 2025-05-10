@@ -1,1 +1,15 @@
-CREATE TABLE plat (nom varchar(60) PRIMARY KEY NOT NUll , prix double NOT NUll , descrp varchar(60) NOT NUll ,cat varChar(60)NOT NUll ,image varchar(60) NOT NUll );
+REATE DATABASE buvette;
+USE buvette;
+CREATE TABLE plat (
+    naom VARCHAR(255) PRIMARY KEY,
+    prix DOUBLE NOT NULL,
+    descrp TEXT,
+    cat VARCHAR(255) NOT NULL,
+    image VARCHAR(255)
+);
+CREATE TABLE users (
+    name VARCHAR(255) PRIMARY KEY,
+    password VARCHAR(255) NOT NULL,
+    TYPE VARCHAR(50) NOT NULL
+);
+INSERT INTO users (name, password, TYPE) VALUES ('admin', 'admin123', 'admin');

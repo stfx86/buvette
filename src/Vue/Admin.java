@@ -2,9 +2,11 @@ package Vue;
 
 import DB.DB;
 import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.*;
+import java.io.File;
 import java.util.*;
 import java.util.List;
 
@@ -18,6 +20,7 @@ public class Admin extends JPanel {
     private final JPanel cardPanel;
     private final List<String> nameSuggestions;
     private final List<String> categorySuggestions;
+    private String selectedImagePath; // Store the selected image path
 
     public Admin(List<Plat> menu, Map<String, List<Plat>> menuData, CardLayout cardLayout, JPanel cardPanel) {
         this.menu = menu;
@@ -26,6 +29,7 @@ public class Admin extends JPanel {
         this.cardPanel = cardPanel;
         this.nameSuggestions = new ArrayList<>();
         this.categorySuggestions = new ArrayList<>();
+        this.selectedImagePath = ""; // Initialize empty
         initializeData();
         initializeUI();
     }
@@ -65,26 +69,7 @@ public class Admin extends JPanel {
         gbc.insets = new Insets(5, 5, 5, 5);
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
-        // Suggestions for autocomplete
-        List<String> descriptionSuggestions = Arrays.asList(
-                "Delicious and fresh dish",
-                "Classic recipe with a modern twist",
-                "Made with premium ingredients",
-                "Perfect for sharing"
-        );
-        List<String> priceSuggestions = Arrays.asList("10", "15", "20", "25", "30", "35", "40");
-        List<String> imageSuggestions = Arrays.asList(
-                "src/images/pizza1.jpeg",
-                "src/images/pizza2.jpeg",
-                "src/images/burger1.jpeg",
-                "src/images/burger2.jpeg",
-                "src/images/dessert1.jpeg",
-                "src/images/dessert2.jpeg",
-                "src/images/drink1.jpeg",
-                "src/images/drink2.jpeg"
-        );
-
-        // Form fields with autocomplete
+        // Form fields
         JLabel nomLabel = new JLabel("Nom du plat :");
         nomLabel.setForeground(Color.WHITE);
         nomLabel.setFont(new Font("Arial", Font.BOLD, 14));
@@ -92,7 +77,7 @@ public class Admin extends JPanel {
         gbc.gridy = 0;
         formPanel.add(nomLabel, gbc);
 
-        AutocompleteTextField nomField = new AutocompleteTextField(20, nameSuggestions);
+        JTextField nomField = new JTextField(20);
         nomField.setFont(new Font("Arial", Font.PLAIN, 14));
         gbc.gridx = 1;
         gbc.gridy = 0;
@@ -105,7 +90,7 @@ public class Admin extends JPanel {
         gbc.gridy = 1;
         formPanel.add(prixLabel, gbc);
 
-        AutocompleteTextField prixField = new AutocompleteTextField(20, priceSuggestions);
+        JTextField prixField = new JTextField(20);
         prixField.setFont(new Font("Arial", Font.PLAIN, 14));
         gbc.gridx = 1;
         gbc.gridy = 1;
@@ -118,7 +103,7 @@ public class Admin extends JPanel {
         gbc.gridy = 2;
         formPanel.add(descLabel, gbc);
 
-        AutocompleteTextField descField = new AutocompleteTextField(20, descriptionSuggestions);
+        JTextField descField = new JTextField(20);
         descField.setFont(new Font("Arial", Font.PLAIN, 14));
         gbc.gridx = 1;
         gbc.gridy = 2;
@@ -131,24 +116,47 @@ public class Admin extends JPanel {
         gbc.gridy = 3;
         formPanel.add(catLabel, gbc);
 
-        AutocompleteTextField catField = new AutocompleteTextField(20, categorySuggestions);
+        JTextField catField = new JTextField(20);
         catField.setFont(new Font("Arial", Font.PLAIN, 14));
         gbc.gridx = 1;
         gbc.gridy = 3;
         formPanel.add(catField, gbc);
 
-        JLabel imgLabel = new JLabel("Chemin image :");
+        JLabel imgLabel = new JLabel("Image :");
         imgLabel.setForeground(Color.WHITE);
         imgLabel.setFont(new Font("Arial", Font.BOLD, 14));
         gbc.gridx = 0;
         gbc.gridy = 4;
         formPanel.add(imgLabel, gbc);
 
-        AutocompleteTextField imgField = new AutocompleteTextField(20, imageSuggestions);
-        imgField.setFont(new Font("Arial", Font.PLAIN, 14));
+        // Image selection panel (button + label)
+        JPanel imgPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        imgPanel.setOpaque(false);
+        JButton chooseImageButton = new JButton("Choisir Image");
+        styleButton(chooseImageButton);
+        JLabel imgPathLabel = new JLabel("Aucune image sélectionnée");
+        imgPathLabel.setForeground(Color.WHITE);
+        imgPathLabel.setFont(new Font("Arial", Font.PLAIN, 14));
+        imgPanel.add(chooseImageButton);
+        imgPanel.add(imgPathLabel);
         gbc.gridx = 1;
         gbc.gridy = 4;
-        formPanel.add(imgField, gbc);
+        formPanel.add(imgPanel, gbc);
+
+        // File chooser for images
+        JFileChooser fileChooser = new JFileChooser("src/images/");
+        FileNameExtensionFilter imageFilter = new FileNameExtensionFilter(
+                "Images (jpg, jpeg, png)", "jpg", "jpeg", "png");
+        fileChooser.setFileFilter(imageFilter);
+        chooseImageButton.addActionListener(e -> {
+            int returnVal = fileChooser.showOpenDialog(this);
+            if (returnVal == JFileChooser.APPROVE_OPTION) {
+                File selectedFile = fileChooser.getSelectedFile();
+                selectedImagePath = selectedFile.getAbsolutePath();
+                imgPathLabel.setText(selectedFile.getName()); // Show file name only
+                imgPathLabel.setToolTipText(selectedImagePath); // Full path in tooltip
+            }
+        });
 
         // Buttons for form actions
         JPanel formButtonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
@@ -204,6 +212,10 @@ public class Admin extends JPanel {
         styleButton(deleteButton, new Color(255, 80, 80));
         adminButtons.add(deleteButton);
 
+        JButton listUsersButton = new JButton("Lister Utilisateurs");
+        styleButton(listUsersButton, new Color(0, 204, 102));
+        adminButtons.add(listUsersButton);
+
         JButton backButtonAdmin = new JButton("Retour");
         styleButton(backButtonAdmin, new Color(200, 200, 200));
         adminButtons.add(backButtonAdmin);
@@ -217,29 +229,27 @@ public class Admin extends JPanel {
                 double prix = Double.parseDouble(prixField.getText().trim());
                 String desc = descField.getText().trim();
                 String cat = catField.getText().trim();
-                String img = imgField.getText().trim();
-                if (!nom.isEmpty() && prix >= 0 && !cat.isEmpty()) {
+                String img = selectedImagePath.trim();
+                if (!nom.isEmpty() && prix >= 0 && !cat.isEmpty() && !img.isEmpty()) {
                     Plat plat = new Plat(nom, prix, desc, cat, img);
                     if (DB.addPlat(plat)) {
                         menu.add(plat);
                         menuData.computeIfAbsent(cat, k -> new ArrayList<>()).add(plat);
                         tableModel.addRow(new Object[]{plat.getNom(), plat.getPrix(), plat.getDescription(), plat.getCategorie(), plat.getImagePath()});
-                        clearForm(nomField, prixField, descField, catField, imgField);
-                        // Update suggestions
+                        clearForm(new JTextField[]{nomField, prixField, descField, catField}, imgPathLabel);
+                        // Update suggestions (for consistency)
                         if (!nameSuggestions.contains(nom)) {
                             nameSuggestions.add(nom);
-                            nomField.setSuggestions(nameSuggestions);
                         }
                         if (!categorySuggestions.contains(cat)) {
                             categorySuggestions.add(cat);
-                            catField.setSuggestions(categorySuggestions);
                         }
                         JOptionPane.showMessageDialog(this, "Plat ajouté avec succès !", "Succès", JOptionPane.INFORMATION_MESSAGE);
                     } else {
                         JOptionPane.showMessageDialog(this, "Erreur lors de l'ajout du plat dans la base de données !", "Erreur", JOptionPane.ERROR_MESSAGE);
                     }
                 } else {
-                    JOptionPane.showMessageDialog(this, "Veuillez entrer des données valides !", "Erreur", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(this, "Veuillez entrer des données valides et sélectionner une image !", "Erreur", JOptionPane.ERROR_MESSAGE);
                 }
             } catch (NumberFormatException ex) {
                 JOptionPane.showMessageDialog(this, "Prix invalide !", "Erreur", JOptionPane.ERROR_MESSAGE);
@@ -247,7 +257,7 @@ public class Admin extends JPanel {
         });
 
         clearButton.addActionListener(e -> {
-            clearForm(nomField, prixField, descField, catField, imgField);
+            clearForm(new JTextField[]{nomField, prixField, descField, catField}, imgPathLabel);
         });
 
         modifyButton.addActionListener(e -> {
@@ -258,8 +268,8 @@ public class Admin extends JPanel {
                     double prix = Double.parseDouble(prixField.getText().trim());
                     String desc = descField.getText().trim();
                     String cat = catField.getText().trim();
-                    String img = imgField.getText().trim();
-                    if (!nom.isEmpty() && prix >= 0 && !cat.isEmpty()) {
+                    String img = selectedImagePath.trim();
+                    if (!nom.isEmpty() && prix >= 0 && !cat.isEmpty() && !img.isEmpty()) {
                         String oldCat = (String) tableModel.getValueAt(selectedRow, 3);
                         Plat selectedPlat = menu.get(selectedRow);
                         Plat newPlat = new Plat(nom, prix, desc, cat, img);
@@ -276,22 +286,20 @@ public class Admin extends JPanel {
                             tableModel.setValueAt(desc, selectedRow, 2);
                             tableModel.setValueAt(cat, selectedRow, 3);
                             tableModel.setValueAt(img, selectedRow, 4);
-                            clearForm(nomField, prixField, descField, catField, imgField);
-                            // Update suggestions
+                            clearForm(new JTextField[]{nomField, prixField, descField, catField}, imgPathLabel);
+                            // Update suggestions (for consistency)
                             if (!nameSuggestions.contains(nom)) {
                                 nameSuggestions.add(nom);
-                                nomField.setSuggestions(nameSuggestions);
                             }
                             if (!categorySuggestions.contains(cat)) {
                                 categorySuggestions.add(cat);
-                                catField.setSuggestions(categorySuggestions);
                             }
                             JOptionPane.showMessageDialog(this, "Plat modifié avec succès !", "Succès", JOptionPane.INFORMATION_MESSAGE);
                         } else {
                             JOptionPane.showMessageDialog(this, "Erreur lors de la modification du plat dans la base de données !", "Erreur", JOptionPane.ERROR_MESSAGE);
                         }
                     } else {
-                        JOptionPane.showMessageDialog(this, "Veuillez entrer des données valides !", "Erreur", JOptionPane.ERROR_MESSAGE);
+                        JOptionPane.showMessageDialog(this, "Veuillez entrer des données valides et sélectionner une image !", "Erreur", JOptionPane.ERROR_MESSAGE);
                     }
                 } catch (NumberFormatException ex) {
                     JOptionPane.showMessageDialog(this, "Prix invalide !", "Erreur", JOptionPane.ERROR_MESSAGE);
@@ -313,10 +321,8 @@ public class Admin extends JPanel {
                         if (menuData.get(selectedPlat.getCategorie()).isEmpty()) {
                             menuData.remove(selectedPlat.getCategorie());
                             categorySuggestions.remove(selectedPlat.getCategorie());
-                            catField.setSuggestions(categorySuggestions);
                         }
                         nameSuggestions.remove(selectedPlat.getNom());
-                        nomField.setSuggestions(nameSuggestions);
                         tableModel.removeRow(selectedRow);
                         JOptionPane.showMessageDialog(this, "Plat supprimé avec succès !", "Succès", JOptionPane.INFORMATION_MESSAGE);
                     } else {
@@ -325,6 +331,19 @@ public class Admin extends JPanel {
                 }
             } else {
                 JOptionPane.showMessageDialog(this, "Sélectionnez un plat à supprimer !", "Erreur", JOptionPane.ERROR_MESSAGE);
+            }
+        });
+
+        listUsersButton.addActionListener(e -> {
+            List<String> users = DB.listUsers();
+            if (users.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Aucun utilisateur trouvé dans la base de données.", "Information", JOptionPane.INFORMATION_MESSAGE);
+            } else {
+                StringBuilder userList = new StringBuilder("Utilisateurs :\n");
+                for (String user : users) {
+                    userList.append("- ").append(user).append("\n");
+                }
+                JOptionPane.showMessageDialog(this, userList.toString(), "Liste des Utilisateurs", JOptionPane.INFORMATION_MESSAGE);
             }
         });
 
@@ -341,7 +360,9 @@ public class Admin extends JPanel {
                         prixField.setText(String.valueOf(tableModel.getValueAt(selectedRow, 1)));
                         descField.setText((String) tableModel.getValueAt(selectedRow, 2));
                         catField.setText((String) tableModel.getValueAt(selectedRow, 3));
-                        imgField.setText((String) tableModel.getValueAt(selectedRow, 4));
+                        selectedImagePath = (String) tableModel.getValueAt(selectedRow, 4);
+                        imgPathLabel.setText(new File(selectedImagePath).getName()); // Show file name
+                        imgPathLabel.setToolTipText(selectedImagePath); // Full path in tooltip
                     }
                 }
             }
@@ -372,9 +393,12 @@ public class Admin extends JPanel {
         });
     }
 
-    private void clearForm(JTextField... fields) {
+    private void clearForm(JTextField[] fields, JLabel imgPathLabel) {
         for (JTextField field : fields) {
             field.setText("");
         }
+        selectedImagePath = "";
+        imgPathLabel.setText("Aucune image sélectionnée");
+        imgPathLabel.setToolTipText(null);
     }
 }

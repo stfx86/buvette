@@ -13,6 +13,7 @@ import javax.swing.event.DocumentEvent;
 public class AutocompleteTextField extends JTextField {
     private JPopupMenu popupMenu;
     private List<String> suggestions;
+    private Timer showSuggestionsTimer;
 
     public AutocompleteTextField(int columns, List<String> suggestions) {
         super(columns);
@@ -22,6 +23,11 @@ public class AutocompleteTextField extends JTextField {
     }
 
     private void setupAutocomplete() {
+        // Timer to control delay before showing suggestions
+        showSuggestionsTimer = new Timer(300, e -> showSuggestions());
+        showSuggestionsTimer.setRepeats(false);  // Execute only once after delay
+
+        // Add a focus listener to manage showing/hiding the popup
         addFocusListener(new FocusAdapter() {
             @Override
             public void focusGained(FocusEvent e) {
@@ -30,53 +36,74 @@ public class AutocompleteTextField extends JTextField {
 
             @Override
             public void focusLost(FocusEvent e) {
-                popupMenu.setVisible(false);
+                SwingUtilities.invokeLater(() -> popupMenu.setVisible(false));
             }
         });
 
+        // Document listener to show suggestions when the text changes
         getDocument().addDocumentListener(new DocumentListener() {
             @Override
             public void insertUpdate(DocumentEvent e) {
-                showSuggestions();
+                scheduleShowSuggestions();
             }
 
             @Override
             public void removeUpdate(DocumentEvent e) {
-                showSuggestions();
+                scheduleShowSuggestions();
             }
 
             @Override
             public void changedUpdate(DocumentEvent e) {
-                showSuggestions();
+                scheduleShowSuggestions();
+            }
+        });
+
+        // Hide the suggestions popup if the user clicks anywhere outside the text field
+        addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                if (!getBounds().contains(e.getPoint())) {
+                    popupMenu.setVisible(false);
+                }
             }
         });
     }
 
+    private void scheduleShowSuggestions() {
+        // Reset the timer if text is changing
+        showSuggestionsTimer.restart();
+    }
+
     private void showSuggestions() {
-        popupMenu.removeAll();
-        String input = getText().trim().toLowerCase();
-        List<String> filteredSuggestions = new ArrayList<>();
+        SwingUtilities.invokeLater(() -> {
+            popupMenu.removeAll();
+            String input = getText().trim().toLowerCase();
+            List<String> filteredSuggestions = new ArrayList<>();
 
-        for (String suggestion : suggestions) {
-            if (input.isEmpty() || suggestion.toLowerCase().contains(input)) {
-                filteredSuggestions.add(suggestion);
+            // Filter suggestions based on the input text
+            for (String suggestion : suggestions) {
+                if (input.isEmpty() || suggestion.toLowerCase().contains(input)) {
+                    filteredSuggestions.add(suggestion);
+                }
             }
-        }
 
-        for (String suggestion : filteredSuggestions) {
-            JMenuItem item = new JMenuItem(suggestion);
-            item.addActionListener(e -> {
-                setText(suggestion);
+            // Add filtered suggestions to the popup
+            for (String suggestion : filteredSuggestions) {
+                JMenuItem item = new JMenuItem(suggestion);
+                item.addActionListener(e -> {
+                    setText(suggestion);
+                    popupMenu.setVisible(false);
+                });
+                popupMenu.add(item);
+            }
+
+            // Show the popup if there are any filtered suggestions
+            if (!filteredSuggestions.isEmpty()) {
+                popupMenu.show(this, 0, getHeight());
+            } else {
                 popupMenu.setVisible(false);
-            });
-            popupMenu.add(item);
-        }
-
-        if (!filteredSuggestions.isEmpty()) {
-            popupMenu.show(this, 0, getHeight());
-        } else {
-            popupMenu.setVisible(false);
-        }
+            }
+        });
     }
 
     public void setSuggestions(List<String> suggestions) {
