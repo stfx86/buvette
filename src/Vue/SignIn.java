@@ -4,6 +4,8 @@
  */
 package Vue;
 import DB.DB;
+import java.awt.Dimension;
+import javax.swing.JButton;
 /**
  *
  * @author stof
@@ -333,7 +335,12 @@ public class SignIn extends javax.swing.JFrame {
  
     
 javax.swing.Timer timer = new javax.swing.Timer(1500, e -> {
-    new BuvetteApp().setVisible(true);
+   BuvetteApp buvetteApp= new BuvetteApp() 
+           ;
+
+   
+   buvetteApp.setVisible(true);
+    
     this.dispose();
 });
 timer.setRepeats(false); // <-- important!
