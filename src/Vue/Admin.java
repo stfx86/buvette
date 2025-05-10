@@ -1,24 +1,21 @@
 package Vue;
 
+import DB.DB;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.*;
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.*;
 import java.util.List;
 
 /**
- * Standalone class for the admin panel, handling dish management.
+ * Standalone class for the admin panel, handling dish management with database integration.
  */
 public class Admin extends JPanel {
     private final List<Plat> menu;
     private final Map<String, List<Plat>> menuData;
     private final CardLayout cardLayout;
     private final JPanel cardPanel;
-    private final String DATA_FILE = "menu.txt";
     private final List<String> nameSuggestions;
     private final List<String> categorySuggestions;
 
@@ -28,11 +25,26 @@ public class Admin extends JPanel {
         this.cardLayout = cardLayout;
         this.cardPanel = cardPanel;
         this.nameSuggestions = new ArrayList<>();
-        for (Plat plat : menu) {
-            nameSuggestions.add(plat.nom);
-        }
-        this.categorySuggestions = new ArrayList<>(menuData.keySet());
+        this.categorySuggestions = new ArrayList<>();
+        initializeData();
         initializeUI();
+    }
+
+    private void initializeData() {
+        // Load dishes from database
+        List<Plat> plats = DB.listPlats();
+        menu.clear();
+        menuData.clear();
+        menu.addAll(plats);
+        for (Plat plat : plats) {
+            menuData.computeIfAbsent(plat.getCategorie(), k -> new ArrayList<>()).add(plat);
+            if (!nameSuggestions.contains(plat.getNom())) {
+                nameSuggestions.add(plat.getNom());
+            }
+            if (!categorySuggestions.contains(plat.getCategorie())) {
+                categorySuggestions.add(plat.getCategorie());
+            }
+        }
     }
 
     private void initializeUI() {
@@ -173,7 +185,7 @@ public class Admin extends JPanel {
 
         // Populate table
         for (Plat plat : menu) {
-            tableModel.addRow(new Object[]{plat.nom, plat.prix, plat.description, plat.categorie, plat.imagePath});
+            tableModel.addRow(new Object[]{plat.getNom(), plat.getPrix(), plat.getDescription(), plat.getCategorie(), plat.getImagePath()});
         }
 
         JScrollPane tableScrollPane = new JScrollPane(adminMenuTable);
@@ -208,19 +220,24 @@ public class Admin extends JPanel {
                 String img = imgField.getText().trim();
                 if (!nom.isEmpty() && prix >= 0 && !cat.isEmpty()) {
                     Plat plat = new Plat(nom, prix, desc, cat, img);
-                    menu.add(plat);
-                    menuData.computeIfAbsent(cat, k -> new ArrayList<>()).add(plat);
-                    tableModel.addRow(new Object[]{plat.nom, plat.prix, plat.description, plat.categorie, plat.imagePath});
-                    saveMenu();
-                    clearForm(nomField, prixField, descField, catField, imgField);
-                    // Update suggestions
-                    nameSuggestions.add(nom);
-                    nomField.setSuggestions(nameSuggestions);
-                    if (!categorySuggestions.contains(cat)) {
-                        categorySuggestions.add(cat);
-                        catField.setSuggestions(categorySuggestions);
+                    if (DB.addPlat(plat)) {
+                        menu.add(plat);
+                        menuData.computeIfAbsent(cat, k -> new ArrayList<>()).add(plat);
+                        tableModel.addRow(new Object[]{plat.getNom(), plat.getPrix(), plat.getDescription(), plat.getCategorie(), plat.getImagePath()});
+                        clearForm(nomField, prixField, descField, catField, imgField);
+                        // Update suggestions
+                        if (!nameSuggestions.contains(nom)) {
+                            nameSuggestions.add(nom);
+                            nomField.setSuggestions(nameSuggestions);
+                        }
+                        if (!categorySuggestions.contains(cat)) {
+                            categorySuggestions.add(cat);
+                            catField.setSuggestions(categorySuggestions);
+                        }
+                        JOptionPane.showMessageDialog(this, "Plat ajouté avec succès !", "Succès", JOptionPane.INFORMATION_MESSAGE);
+                    } else {
+                        JOptionPane.showMessageDialog(this, "Erreur lors de l'ajout du plat dans la base de données !", "Erreur", JOptionPane.ERROR_MESSAGE);
                     }
-                    JOptionPane.showMessageDialog(this, "Plat ajouté avec succès !", "Succès", JOptionPane.INFORMATION_MESSAGE);
                 } else {
                     JOptionPane.showMessageDialog(this, "Veuillez entrer des données valides !", "Erreur", JOptionPane.ERROR_MESSAGE);
                 }
@@ -245,30 +262,34 @@ public class Admin extends JPanel {
                     if (!nom.isEmpty() && prix >= 0 && !cat.isEmpty()) {
                         String oldCat = (String) tableModel.getValueAt(selectedRow, 3);
                         Plat selectedPlat = menu.get(selectedRow);
-                        menuData.get(oldCat).remove(selectedPlat);
-                        selectedPlat.nom = nom;
-                        selectedPlat.prix = prix;
-                        selectedPlat.description = desc;
-                        selectedPlat.categorie = cat;
-                        selectedPlat.imagePath = img;
-                        menuData.computeIfAbsent(cat, k -> new ArrayList<>()).add(selectedPlat);
-                        tableModel.setValueAt(nom, selectedRow, 0);
-                        tableModel.setValueAt(prix, selectedRow, 1);
-                        tableModel.setValueAt(desc, selectedRow, 2);
-                        tableModel.setValueAt(cat, selectedRow, 3);
-                        tableModel.setValueAt(img, selectedRow, 4);
-                        saveMenu();
-                        clearForm(nomField, prixField, descField, catField, imgField);
-                        // Update suggestions
-                        if (!nameSuggestions.contains(nom)) {
-                            nameSuggestions.add(nom);
-                            nomField.setSuggestions(nameSuggestions);
+                        Plat newPlat = new Plat(nom, prix, desc, cat, img);
+                        if (DB.updatePlat(selectedPlat, newPlat)) {
+                            menuData.get(oldCat).remove(selectedPlat);
+                            selectedPlat.setNom(nom);
+                            selectedPlat.setPrix(prix);
+                            selectedPlat.setDescription(desc);
+                            selectedPlat.setCategorie(cat);
+                            selectedPlat.setImagePath(img);
+                            menuData.computeIfAbsent(cat, k -> new ArrayList<>()).add(selectedPlat);
+                            tableModel.setValueAt(nom, selectedRow, 0);
+                            tableModel.setValueAt(prix, selectedRow, 1);
+                            tableModel.setValueAt(desc, selectedRow, 2);
+                            tableModel.setValueAt(cat, selectedRow, 3);
+                            tableModel.setValueAt(img, selectedRow, 4);
+                            clearForm(nomField, prixField, descField, catField, imgField);
+                            // Update suggestions
+                            if (!nameSuggestions.contains(nom)) {
+                                nameSuggestions.add(nom);
+                                nomField.setSuggestions(nameSuggestions);
+                            }
+                            if (!categorySuggestions.contains(cat)) {
+                                categorySuggestions.add(cat);
+                                catField.setSuggestions(categorySuggestions);
+                            }
+                            JOptionPane.showMessageDialog(this, "Plat modifié avec succès !", "Succès", JOptionPane.INFORMATION_MESSAGE);
+                        } else {
+                            JOptionPane.showMessageDialog(this, "Erreur lors de la modification du plat dans la base de données !", "Erreur", JOptionPane.ERROR_MESSAGE);
                         }
-                        if (!categorySuggestions.contains(cat)) {
-                            categorySuggestions.add(cat);
-                            catField.setSuggestions(categorySuggestions);
-                        }
-                        JOptionPane.showMessageDialog(this, "Plat modifié avec succès !", "Succès", JOptionPane.INFORMATION_MESSAGE);
                     } else {
                         JOptionPane.showMessageDialog(this, "Veuillez entrer des données valides !", "Erreur", JOptionPane.ERROR_MESSAGE);
                     }
@@ -286,18 +307,21 @@ public class Admin extends JPanel {
                 int confirm = JOptionPane.showConfirmDialog(this, "Voulez-vous vraiment supprimer ce plat ?", "Confirmation", JOptionPane.YES_NO_OPTION);
                 if (confirm == JOptionPane.YES_OPTION) {
                     Plat selectedPlat = menu.get(selectedRow);
-                    menu.remove(selectedRow);
-                    menuData.get(selectedPlat.categorie).remove(selectedPlat);
-                    if (menuData.get(selectedPlat.categorie).isEmpty()) {
-                        menuData.remove(selectedPlat.categorie);
-                        categorySuggestions.remove(selectedPlat.categorie);
-                        catField.setSuggestions(categorySuggestions);
+                    if (DB.deletePlat(selectedPlat.getNom())) {
+                        menu.remove(selectedRow);
+                        menuData.get(selectedPlat.getCategorie()).remove(selectedPlat);
+                        if (menuData.get(selectedPlat.getCategorie()).isEmpty()) {
+                            menuData.remove(selectedPlat.getCategorie());
+                            categorySuggestions.remove(selectedPlat.getCategorie());
+                            catField.setSuggestions(categorySuggestions);
+                        }
+                        nameSuggestions.remove(selectedPlat.getNom());
+                        nomField.setSuggestions(nameSuggestions);
+                        tableModel.removeRow(selectedRow);
+                        JOptionPane.showMessageDialog(this, "Plat supprimé avec succès !", "Succès", JOptionPane.INFORMATION_MESSAGE);
+                    } else {
+                        JOptionPane.showMessageDialog(this, "Erreur lors de la suppression du plat dans la base de données !", "Erreur", JOptionPane.ERROR_MESSAGE);
                     }
-                    nameSuggestions.remove(selectedPlat.nom);
-                    nomField.setSuggestions(nameSuggestions);
-                    tableModel.removeRow(selectedRow);
-                    saveMenu();
-                    JOptionPane.showMessageDialog(this, "Plat supprimé avec succès !", "Succès", JOptionPane.INFORMATION_MESSAGE);
                 }
             } else {
                 JOptionPane.showMessageDialog(this, "Sélectionnez un plat à supprimer !", "Erreur", JOptionPane.ERROR_MESSAGE);
@@ -351,17 +375,6 @@ public class Admin extends JPanel {
     private void clearForm(JTextField... fields) {
         for (JTextField field : fields) {
             field.setText("");
-        }
-    }
-
-    private void saveMenu() {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(DATA_FILE))) {
-            for (Plat plat : menu) {
-                writer.write(plat.nom + ";" + plat.prix + ";" + plat.description + ";" + plat.categorie + ";" + plat.imagePath);
-                writer.newLine();
-            }
-        } catch (IOException e) {
-            JOptionPane.showMessageDialog(this, "Erreur lors de la sauvegarde !", "Erreur", JOptionPane.ERROR_MESSAGE);
         }
     }
 }

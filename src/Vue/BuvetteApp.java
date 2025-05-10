@@ -1,9 +1,9 @@
 package Vue;
 
+import DB.DB;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.io.*;
 import java.util.*;
 import java.util.List;
 
@@ -17,8 +17,6 @@ public class BuvetteApp extends JFrame {
     private JPanel platsPanel;
     private List<Plat> menu;
     private Map<String, List<Plat>> menuData;
-    private final String DATA_FILE = "menu.txt";
-    private final String ADMIN_PASSWORD = "admin123";
 
     public BuvetteApp() {
         menu = new ArrayList<>();
@@ -52,33 +50,41 @@ public class BuvetteApp extends JFrame {
 
     private void initializeMenuData() {
         if (menu.isEmpty()) {
-            menuData.put("Pizzas", new ArrayList<>(Arrays.asList(
+            // Initialize default dishes and save to database
+            List<Plat> pizzas = new ArrayList<>(Arrays.asList(
                     new Plat("Pizza Margherita", 30, "Classic pizza with tomato, mozzarella, and basil.", "Pizzas", "src/images/pizza1.jpeg"),
                     new Plat("Pizza Pepperoni", 40, "Spicy pepperoni with mozzarella and tomato sauce.", "Pizzas", "src/images/pizza2.jpeg")
-            )));
-
-            menuData.put("Burgers", new ArrayList<>(Arrays.asList(
+            ));
+            List<Plat> burgers = new ArrayList<>(Arrays.asList(
                     new Plat("Cheeseburger", 35, "Beef patty with cheddar, lettuce, and tomato.", "Burgers", "src/images/burger1.jpeg"),
                     new Plat("Bacon Burger", 38, "Beef patty with crispy bacon and BBQ sauce.", "Burgers", "src/images/burger2.jpeg")
-            )));
-
-            menuData.put("Desserts", new ArrayList<>(Arrays.asList(
+            ));
+            List<Plat> desserts = new ArrayList<>(Arrays.asList(
                     new Plat("Tiramisu", 25, "Coffee-flavored Italian dessert with mascarpone.", "Desserts", "src/images/dessert1.jpeg"),
                     new Plat("Crème Brûlée", 28, "Rich custard with a caramelized sugar crust.", "Desserts", "src/images/dessert2.jpeg")
-            )));
-
-            menuData.put("Drinks", new ArrayList<>(Arrays.asList(
+            ));
+            List<Plat> drinks = new ArrayList<>(Arrays.asList(
                     new Plat("CocaCola", 10, "Refreshing carbonated soft drink.", "Drinks", "src/images/drink1.jpeg"),
                     new Plat("Orange Juice", 12, "Freshly squeezed orange juice.", "Drinks", "src/images/drink2.jpeg")
-            )));
+            ));
+
+            menuData.put("Pizzas", pizzas);
+            menuData.put("Burgers", burgers);
+            menuData.put("Desserts", desserts);
+            menuData.put("Drinks", drinks);
 
             for (List<Plat> plats : menuData.values()) {
-                menu.addAll(plats);
+                for (Plat plat : plats) {
+                    if (DB.addPlat(plat)) {
+                        menu.add(plat);
+                    } else {
+                        System.err.println("Failed to add plat to database: " + plat.getNom());
+                    }
+                }
             }
-            saveMenu();
         } else {
             for (Plat plat : menu) {
-                menuData.computeIfAbsent(plat.categorie, k -> new ArrayList<>()).add(plat);
+                menuData.computeIfAbsent(plat.getCategorie(), k -> new ArrayList<>()).add(plat);
             }
         }
     }
@@ -197,7 +203,7 @@ public class BuvetteApp extends JFrame {
         card.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1));
 
         try {
-            ImageIcon icon = new ImageIcon(plat.imagePath);
+            ImageIcon icon = new ImageIcon(plat.getImagePath());
             Image img = icon.getImage().getScaledInstance(230, 140, Image.SCALE_SMOOTH);
             JLabel imageLabel = new JLabel(new ImageIcon(img));
             imageLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -210,18 +216,18 @@ public class BuvetteApp extends JFrame {
 
         card.add(Box.createRigidArea(new Dimension(0, 10)));
 
-        JLabel nameLabel = new JLabel(plat.nom);
+        JLabel nameLabel = new JLabel(plat.getNom());
         nameLabel.setFont(new Font("Arial", Font.BOLD, 16));
         nameLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         card.add(nameLabel);
 
-        JLabel priceLabel = new JLabel(plat.prix + " DH");
+        JLabel priceLabel = new JLabel(plat.getPrix() + " DH");
         priceLabel.setFont(new Font("Arial", Font.PLAIN, 14));
         priceLabel.setForeground(new Color(0, 153, 76));
         priceLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         card.add(priceLabel);
 
-        JTextArea descLabel = new JTextArea(plat.description);
+        JTextArea descLabel = new JTextArea(plat.getDescription());
         descLabel.setFont(new Font("Arial", Font.PLAIN, 12));
         descLabel.setLineWrap(true);
         descLabel.setWrapStyleWord(true);
@@ -306,7 +312,8 @@ public class BuvetteApp extends JFrame {
         loginPanel.add(backButtonLogin, gbc);
 
         loginButton.addActionListener(e -> {
-            if (passwordField.getText().equals(ADMIN_PASSWORD)) {
+            String password = new String(passwordField.getPassword()).trim();
+            if (DB.verifyAdmin("admin", password)) {
                 cardLayout.show(cardPanel, "Admin");
                 passwordField.setText("");
             } else {
@@ -344,32 +351,22 @@ public class BuvetteApp extends JFrame {
         });
     }
 
-    private void saveMenu() {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(DATA_FILE))) {
-            for (Plat plat : menu) {
-                writer.write(plat.nom + ";" + plat.prix + ";" + plat.description + ";" + plat.categorie + ";" + plat.imagePath);
-                writer.newLine();
-            }
-        } catch (IOException e) {
-            JOptionPane.showMessageDialog(this, "Erreur lors de la sauvegarde !", "Erreur", JOptionPane.ERROR_MESSAGE);
-        }
-    }
-
     private void loadMenu() {
-        try (BufferedReader reader = new BufferedReader(new FileReader(DATA_FILE))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                String[] parts = line.split(";");
-                if (parts.length == 5) {
-                    menu.add(new Plat(parts[0], Double.parseDouble(parts[1]), parts[2], parts[3], parts[4]));
-                }
-            }
-        } catch (IOException | NumberFormatException e) {
-            // File not found or empty
+        try {
+            menu.addAll(DB.listPlats());
+        } catch (Exception e) {
+            System.err.println("Error loading plats from database:");
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Erreur lors du chargement des plats depuis la base de données !", "Erreur", JOptionPane.ERROR_MESSAGE);
         }
     }
 
     public static void main(String[] args) {
+        // Test database connection before starting
+        if (!DB.testConnection()) {
+            JOptionPane.showMessageDialog(null, "Impossible de se connecter à la base de données !", "Erreur", JOptionPane.ERROR_MESSAGE);
+            System.exit(1);
+        }
         SwingUtilities.invokeLater(() -> new BuvetteApp().setVisible(true));
     }
 }
