@@ -1,19 +1,11 @@
 package Vue;
+
 import java.awt.*;
-import javax.swing.*;
-import javax.swing.border.*;
 
+/**
+ * A FlowLayout that wraps components to the next line.
+ */
 public class WrapLayout extends FlowLayout {
-    private Dimension preferredLayoutSize;
-
-    public WrapLayout() {
-        super();
-    }
-
-    public WrapLayout(int align) {
-        super(align);
-    }
-
     public WrapLayout(int align, int hgap, int vgap) {
         super(align, hgap, vgap);
     }
@@ -25,9 +17,7 @@ public class WrapLayout extends FlowLayout {
 
     @Override
     public Dimension minimumLayoutSize(Container target) {
-        Dimension minimum = layoutSize(target, false);
-        minimum.width -= (getHgap() + 1);
-        return minimum;
+        return layoutSize(target, false);
     }
 
     private Dimension layoutSize(Container target, boolean preferred) {
@@ -36,7 +26,6 @@ public class WrapLayout extends FlowLayout {
             if (targetWidth == 0) {
                 targetWidth = Integer.MAX_VALUE;
             }
-
             int hgap = getHgap();
             int vgap = getVgap();
             Insets insets = target.getInsets();
@@ -47,42 +36,27 @@ public class WrapLayout extends FlowLayout {
             int rowWidth = 0;
             int rowHeight = 0;
 
-            int nmembers = target.getComponentCount();
-
-            for (int i = 0; i < nmembers; i++) {
-                Component m = target.getComponent(i);
+            for (Component m : target.getComponents()) {
                 if (m.isVisible()) {
                     Dimension d = preferred ? m.getPreferredSize() : m.getMinimumSize();
                     if (rowWidth + d.width > maxWidth) {
-                        addRow(dim, rowWidth, rowHeight);
+                        dim.width = Math.max(dim.width, rowWidth);
+                        dim.height += rowHeight + vgap;
                         rowWidth = 0;
                         rowHeight = 0;
                     }
-                    if (rowWidth != 0) {
-                        rowWidth += hgap;
-                    }
-                    rowWidth += d.width;
+                    rowWidth += d.width + hgap;
                     rowHeight = Math.max(rowHeight, d.height);
                 }
             }
-            addRow(dim, rowWidth, rowHeight);
+
+            dim.width = Math.max(dim.width, rowWidth);
+            dim.height += rowHeight + vgap;
 
             dim.width += horizontalInsetsAndGap;
             dim.height += insets.top + insets.bottom + vgap * 2;
 
-            Container scrollPane = SwingUtilities.getAncestorOfClass(JScrollPane.class, target);
-            if (scrollPane != null && target.isValid()) {
-                dim.width -= (hgap + 1);
-            }
             return dim;
         }
-    }
-
-    private void addRow(Dimension dim, int rowWidth, int rowHeight) {
-        dim.width = Math.max(dim.width, rowWidth);
-        if (dim.height > 0) {
-            dim.height += getVgap();
-        }
-        dim.height += rowHeight;
     }
 }
