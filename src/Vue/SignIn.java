@@ -209,7 +209,7 @@ public class SignIn extends javax.swing.JFrame {
             }
         });
 
-        jLabel1.setFont(new java.awt.Font("KanjiStrokeOrders", 1, 24)); // NOI18N
+        jLabel1.setFont(new java.awt.Font("Dialog", 1, 24)); // NOI18N
         jLabel1.setForeground(new java.awt.Color(255, 255, 255));
 
         javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
@@ -242,8 +242,8 @@ public class SignIn extends javax.swing.JFrame {
                                         .addComponent(jButton2))
                                     .addComponent(jCheckBox1)))
                             .addGroup(jPanel5Layout.createSequentialGroup()
-                                .addGap(102, 102, 102)
-                                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 199, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                .addGap(51, 51, 51)
+                                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 368, javax.swing.GroupLayout.PREFERRED_SIZE)))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                 .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, 568, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
@@ -328,17 +328,22 @@ public class SignIn extends javax.swing.JFrame {
 
     if (DB.verifyUser(username, password)) {
         // Login success
-        System.out.println("Login successful!");
-    jLabel1.setText("welcome user ");
-//        Thread.sleep();
+        // System.out.println("Login successful  (ᗒ‿ᗕ) ");
+        jLabel1.setText("welcome user  (ᗒ‿ᗕ) ");
+ 
+    
+javax.swing.Timer timer = new javax.swing.Timer(1500, e -> {
+    new BuvetteApp().setVisible(true);
+    this.dispose();
+});
+timer.setRepeats(false); // <-- important!
+timer.start();
 
-         new BuvetteApp().setVisible(true);
 
-         this.dispose();
         // TODO: Redirect to the main page or dashboard
     } else {
         // Login failed
-        System.out.println("Pane.ERROR_MESSAGE");
+        jLabel1.setText("Login failed  (´•╭╮•`) ");
     }
         
         
@@ -389,7 +394,7 @@ public class SignIn extends javax.swing.JFrame {
             }
         });
     }
- BackgroundPanel backgroundPanel = new BackgroundPanel("src/images/background.jpg"); 
+// BackgroundPanel backgroundPanel = new BackgroundPanel("src/images/background.jpg"); 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;

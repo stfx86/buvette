@@ -5,4 +5,3 @@ Bacon Burger;38.0;Beef patty with crispy bacon and BBQ sauce.;Burgers;src/images
 Tiramisu;25.0;Coffee-flavored Italian dessert with mascarpone.;Desserts;src/images/dessert1.jpeg
 Crème Brûlée;28.0;Rich custard with a caramelized sugar crust.;Desserts;src/images/dessert2.jpeg
 CocaCola;10.0;Refreshing carbonated soft drink.;Drinks;src/images/drink1.jpeg
-Orange Juice;12.0;Freshly squeezed orange juice.;Drinks;src/images/drink2.jpeg
