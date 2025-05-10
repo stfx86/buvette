@@ -10,6 +10,7 @@ import DB.DB;
  *
  * @author stof
  */
+
 public class SignUp extends javax.swing.JFrame {
 
     /**
@@ -62,6 +63,7 @@ public class SignUp extends javax.swing.JFrame {
         jButton1 = new javax.swing.JButton();
         jCheckBox1 = new javax.swing.JCheckBox();
         jLabel1 = new javax.swing.JLabel();
+        jButton2 = new javax.swing.JButton();
 
         jPanel2.setBackground(new java.awt.Color(97, 212, 195));
         jPanel2.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
@@ -226,8 +228,16 @@ public class SignUp extends javax.swing.JFrame {
             }
         });
 
-        jLabel1.setFont(new java.awt.Font("KanjiStrokeOrders", 1, 24)); // NOI18N
+        jLabel1.setFont(new java.awt.Font("Dialog", 1, 24)); // NOI18N
         jLabel1.setForeground(new java.awt.Color(255, 255, 255));
+
+        jButton2.setBackground(new java.awt.Color(255, 153, 153));
+        jButton2.setText("Go Back");
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
         jPanel5.setLayout(jPanel5Layout);
@@ -235,8 +245,8 @@ public class SignUp extends javax.swing.JFrame {
             jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel5Layout.createSequentialGroup()
                 .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel5Layout.createSequentialGroup()
-                        .addGap(0, 76, Short.MAX_VALUE)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel5Layout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
                         .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel4)
                             .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 270, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -249,16 +259,20 @@ public class SignUp extends javax.swing.JFrame {
                             .addComponent(jSeparator6, javax.swing.GroupLayout.PREFERRED_SIZE, 270, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(jCheckBox1))
                         .addGap(111, 111, 111))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel5Layout.createSequentialGroup()
+                        .addGap(107, 170, Short.MAX_VALUE)
+                        .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 173, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 173, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(183, 183, 183))
                     .addGroup(jPanel5Layout.createSequentialGroup()
                         .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(jPanel5Layout.createSequentialGroup()
                                 .addGap(115, 115, 115)
-                                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 173, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(jSeparator2, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                .addComponent(jSeparator2, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addGroup(jPanel5Layout.createSequentialGroup()
-                                .addGap(123, 123, 123)
-                                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 199, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                .addGap(26, 26, 26)
+                                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 463, javax.swing.GroupLayout.PREFERRED_SIZE)))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                 .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, 568, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
@@ -290,9 +304,11 @@ public class SignUp extends javax.swing.JFrame {
                         .addComponent(jSeparator6, javax.swing.GroupLayout.PREFERRED_SIZE, 14, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(jCheckBox1)
-                        .addGap(27, 27, 27)
+                        .addGap(34, 34, 34)
                         .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(118, 118, 118)
+                        .addGap(27, 27, 27)
+                        .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(51, 51, 51)
                         .addComponent(jSeparator2, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addGap(0, 0, Short.MAX_VALUE))
         );
@@ -352,7 +368,7 @@ public class SignUp extends javax.swing.JFrame {
     
     // 1. Check if passwords match
     if (!password.equals(confirmedPassword)) {
-        jLabel1.setText("Passwords do not match!");
+        jLabel1.setText("Passwords do not match (⚈₋₍⚈) ");
         return;
     }
 
@@ -360,23 +376,31 @@ public class SignUp extends javax.swing.JFrame {
     ResultSet rs = DB.getUser(username);
     try {
         if (rs != null && rs.next()) {
-            jLabel1.setText("Username already exists!");
+            jLabel1.setText("Username already exists  (* ˇ╭╮ ˇ ) ");
             return;
         }
     } catch (SQLException e) {
-        jLabel1.setText("Database error while checking username.");
+        jLabel1.setText("Database error while checking username  (◞‸◟) ");
         e.printStackTrace();
         return;
     }
 
     // 3. Add the new user
     if (DB.addUser(username, password, "client")) { // Assuming you want to add all as 'client' type
-        jLabel1.setText("Account created successfully!");
+        
+        jLabel1.setText("Account created successfully (ᗒ‿ᗕ) ");
 
-        new BuvetteApp().setVisible(true); // Open homepage
+
+        javax.swing.Timer timer = new javax.swing.Timer(1500, e -> {
+   new BuvetteApp().setVisible(true); // Open homepage
+//>>>>>>> 50aaa8a4fee7d01a02a19b13d8b1d44fdbb8916b
         this.dispose(); // Close signup window
+});
+timer.setRepeats(false); // <-- important!
+timer.start();
+        
     } else {
-        jLabel1.setText("Failed to create account.");
+        jLabel1.setText("Failed to create account  ((╥╭╮╥))");
     }
         // TODO add your handling code here:
     }//GEN-LAST:event_jButton1ActionPerformed
@@ -384,6 +408,14 @@ public class SignUp extends javax.swing.JFrame {
     private void jCheckBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCheckBox1ActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_jCheckBox1ActionPerformed
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        // TODO add your handling code here:
+        new SignIn().setVisible(true);
+        this.dispose();
+        
+        
+    }//GEN-LAST:event_jButton2ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -429,6 +461,7 @@ public class SignUp extends javax.swing.JFrame {
 // BackgroundPanel backgroundPanel = new BackgroundPanel("src/images/background.jpg"); 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
+    private javax.swing.JButton jButton2;
     private javax.swing.JCheckBox jCheckBox1;
     private javax.swing.JEditorPane jEditorPane1;
     private javax.swing.JLabel jLabel1;

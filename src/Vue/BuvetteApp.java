@@ -6,7 +6,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
 import java.util.List;
-
+    
 /**
  * Main application class for the Buvette Management System.
  */
