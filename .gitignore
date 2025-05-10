@@ -16,3 +16,4 @@ Thumbs.db
 *.log
 
 src/DB/.env
+lib/
