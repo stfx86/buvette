@@ -29,15 +29,27 @@ public class DB {
             URL = reader.readLine();
             USER = reader.readLine();
             PASSWORD = reader.readLine();
+             
+           
+                    
+                    
         } catch (IOException e) {
             System.out.println("Failed to load .env file!");
             e.printStackTrace();
         }
     }
     ////////////////////////////////////////////////////////////////////
+    //URL = "jdbc:mysql://localhost:3306/buvette";
+          // USER = "root";
+         //   PASSWORD = "";
     
     
     public static boolean testConnection() {
+        
+        System.out.println("/"+ URL +"/");
+              System.out.println("/"+  USER +"/");
+              System.out.println( "/"+ PASSWORD +"/" );
+              
     try (Connection conn = connect()) {
         if (conn != null && !conn.isClosed()) {
             System.out.println("Database connection successful!");

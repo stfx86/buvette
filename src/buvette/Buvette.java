@@ -12,7 +12,6 @@ import Vue.*;
 public class Buvette {
     
     
-    
     public static void main(String[] args) {
         
         DB.testConnection();
