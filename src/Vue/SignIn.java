@@ -331,7 +331,7 @@ public class SignIn extends javax.swing.JFrame {
         System.out.println("Login successful!");
     jLabel1.setText("welcome user ");
 //        Thread.sleep();
-         new Homepage().setVisible(true);
+         new BuvetteApp().setVisible(true);
          this.dispose();
         // TODO: Redirect to the main page or dashboard
     } else {

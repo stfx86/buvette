@@ -1,27 +1,27 @@
-package Vue ;
-
+package Vue;
 
 import javax.swing.*;
-
-
-
-
-
 import java.awt.*;
 
-
+/**
+ * Panel for displaying a background image.
+ */
 public class BackgroundPanel extends JPanel {
     private Image backgroundImage;
 
-    // Constructeur pour charger l'image
     public BackgroundPanel(String imagePath) {
-        backgroundImage = new ImageIcon(imagePath).getImage();
+        try {
+            backgroundImage = new ImageIcon(imagePath).getImage();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-        // Dessiner l'image sur tout le JPanel
-        g.drawImage(backgroundImage, 0, 0, getWidth(), getHeight(), this);
+        if (backgroundImage != null) {
+            g.drawImage(backgroundImage, 0, 0, getWidth(), getHeight(), this);
+        }
     }
 }
