@@ -1,0 +1,1 @@
+CREATE TABLE plat (nom varchar(60) PRIMARY KEY NOT NUll , prix double NOT NUll , descrp varchar(60) NOT NUll ,cat varChar(60)NOT NUll ,image varchar(60) NOT NUll );

@@ -1,5 +1,6 @@
 package DB;
 
+import Vue.*;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -17,69 +18,42 @@ public class DB {
     }
 
     private static void loadEnv() {
-/////////  file name : .env   ////////////////////////////
-// EX:                                     /             /                
-//                                                       /
-//        jdbc:mariadb://localhost:3306/buvette          /
-//        stof                                           / 
-//        bennasser                                      /  
-//                                                       /
-////////////////////////////////////////////////////////// duro .env dyalkon hda DB.java 
         try (BufferedReader reader = new BufferedReader(new FileReader("src/DB/.env"))) {
             URL = reader.readLine();
             USER = reader.readLine();
             PASSWORD = reader.readLine();
-             
-           
-                    
-                    
         } catch (IOException e) {
             System.out.println("Failed to load .env file!");
             e.printStackTrace();
         }
     }
-    ////////////////////////////////////////////////////////////////////
-    //URL = "jdbc:mysql://localhost:3306/buvette";
-          // USER = "root";
-         //   PASSWORD = "";
-    
-    
+
     public static boolean testConnection() {
-        
-        System.out.println("/"+ URL +"/");
-              System.out.println("/"+  USER +"/");
-              System.out.println( "/"+ PASSWORD +"/" );
-              
-    try (Connection conn = connect()) {
-        if (conn != null && !conn.isClosed()) {
-            System.out.println("Database connection successful!");
-            return true;
-        } else {
-            System.out.println("Database connection failed!");
+        System.out.println("/" + URL + "/");
+        System.out.println("/" + USER + "/");
+        System.out.println("/" + PASSWORD + "/");
+        try (Connection conn = connect()) {
+            if (conn != null && !conn.isClosed()) {
+                System.out.println("Database connection successful!");
+                return true;
+            } else {
+                System.out.println("Database connection failed!");
+                return false;
+            }
+        } catch (SQLException e) {
+            System.out.println("Database connection error:");
+            e.printStackTrace();
             return false;
         }
-    } catch (SQLException e) {
-        System.out.println("Database connection error:");
-        e.printStackTrace();
-        return false;
     }
-}
 
-        ////////////////////////////////////////////////////////////////////
-    
-        public static boolean verifyUser(String name, String password) {
+    public static boolean verifyUser(String name, String password) {
         String sql = "SELECT * FROM buvette.users WHERE name = ? AND password = ?";
         try (Connection conn = connect(); PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, name);
             stmt.setString(2, password);
             try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    // User exists with matching password
-                    return true;
-                } else {
-                    // No user found or wrong password
-                    return false;
-                }
+                return rs.next();
             }
         } catch (SQLException e) {
             System.out.println("Error verifying user:");
@@ -87,14 +61,21 @@ public class DB {
             return false;
         }
     }
-        
-        
-        ////////////////////////////////////////////////////////////////////
 
-
-    
-    
-    
+    public static boolean verifyAdmin(String name, String password) {
+        String sql = "SELECT * FROM buvette.users WHERE name = ? AND password = ? AND type = 'admin'";
+        try (Connection conn = connect(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, name);
+            stmt.setString(2, password);
+            try (ResultSet rs = stmt.executeQuery()) {
+                return rs.next();
+            }
+        } catch (SQLException e) {
+            System.out.println("Error verifying admin:");
+            e.printStackTrace();
+            return false;
+        }
+    }
 
     private static Connection connect() throws SQLException {
         return DriverManager.getConnection(URL, USER, PASSWORD);
@@ -112,6 +93,41 @@ public class DB {
             return true;
         } catch (SQLException e) {
             System.out.println("Error adding user:");
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public static boolean addPlat(Plat plat) {
+        String sql = "INSERT INTO buvette.plat (naom, prix, descrp, cat, image) VALUES (?, ?, ?, ?, ?)";
+        try (Connection conn = connect(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, plat.getNom());
+            stmt.setDouble(2, plat.getPrix());
+            stmt.setString(3, plat.getDescription());
+            stmt.setString(4, plat.getCategorie());
+            stmt.setString(5, plat.getImagePath());
+            stmt.executeUpdate();
+            return true;
+        } catch (SQLException e) {
+            System.out.println("Error adding plat:");
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public static boolean updatePlat(Plat oldPlat, Plat newPlat) {
+        String sql = "UPDATE buvette.plat SET naom = ?, prix = ?, descrp = ?, cat = ?, image = ? WHERE naom = ?";
+        try (Connection conn = connect(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, newPlat.getNom());
+            stmt.setDouble(2, newPlat.getPrix());
+            stmt.setString(3, newPlat.getDescription());
+            stmt.setString(4, newPlat.getCategorie());
+            stmt.setString(5, newPlat.getImagePath());
+            stmt.setString(6, oldPlat.getNom());
+            int rowsAffected = stmt.executeUpdate();
+            return rowsAffected > 0;
+        } catch (SQLException e) {
+            System.out.println("Error updating plat:");
             e.printStackTrace();
             return false;
         }
@@ -257,11 +273,11 @@ public class DB {
     }
 
     public static boolean deletePlat(String nomp) {
-        String sql = "DELETE FROM buvette.plats WHERE nomp = ?";
+        String sql = "DELETE FROM buvette.plat WHERE naom = ?";
         try (Connection conn = connect(); PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, nomp);
-            stmt.executeUpdate();
-            return true;
+            int rowsAffected = stmt.executeUpdate();
+            return rowsAffected > 0;
         } catch (SQLException e) {
             System.out.println("Error deleting plat:");
             e.printStackTrace();
@@ -269,12 +285,20 @@ public class DB {
         }
     }
 
-    public static List<String> listPlats() {
-        List<String> plats = new ArrayList<>();
-        String sql = "SELECT nomp FROM buvette.plats";
-        try (Connection conn = connect(); Statement stmt = conn.createStatement(); ResultSet rs = stmt.executeQuery(sql)) {
+    public static List<Plat> listPlats() {
+        String sql = "SELECT * FROM buvette.plat";
+        List<Plat> plats = new ArrayList<>();
+        try (Connection conn = connect();
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
             while (rs.next()) {
-                plats.add(rs.getString("nomp"));
+                Plat plat = new Plat();
+                plat.setNom(rs.getString("naom"));
+                plat.setPrix(rs.getDouble("prix"));
+                plat.setDescription(rs.getString("descrp"));
+                plat.setCategorie(rs.getString("cat"));
+                plat.setImagePath(rs.getString("image"));
+                plats.add(plat);
             }
         } catch (SQLException e) {
             System.out.println("Error listing plats:");
