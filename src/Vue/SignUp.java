@@ -373,7 +373,7 @@ public class SignUp extends javax.swing.JFrame {
     if (DB.addUser(username, password, "client")) { // Assuming you want to add all as 'client' type
         jLabel1.setText("Account created successfully!");
 
-        new Homepage().setVisible(true); // Open homepage
+        new BuvetteApp().setVisible(true); // Open homepage
         this.dispose(); // Close signup window
     } else {
         jLabel1.setText("Failed to create account.");
