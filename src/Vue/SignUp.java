@@ -389,10 +389,11 @@ public class SignUp extends javax.swing.JFrame {
     if (DB.addUser(username, password, "client")) { // Assuming you want to add all as 'client' type
         
         jLabel1.setText("Account created successfully (ᗒ‿ᗕ) ");
-
+        SignIn.user.setName(username);
+        SignIn.user.setPassword(password); 
 
         javax.swing.Timer timer = new javax.swing.Timer(1500, e -> {
-   new BuvetteApp().setVisible(true); // Open homepage
+   new BuvetteApp1().setVisible(true); // Open homepage
 //>>>>>>> 50aaa8a4fee7d01a02a19b13d8b1d44fdbb8916b
         this.dispose(); // Close signup window
 });

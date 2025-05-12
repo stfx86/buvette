@@ -61,6 +61,76 @@ public class DB {
             return false;
         }
     }
+    
+    
+    public static boolean chekPassword(String name , String password){
+        String sql = "SELECT password from users WHERE name = ?" ;
+        
+        try (Connection conn = connect(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, name);
+           
+            try (ResultSet rs = stmt.executeQuery()) {
+                return(password.equals(rs)) ;
+            }
+        } catch (SQLException e) {
+            System.out.println("Error verifying admin:");
+            e.printStackTrace();
+            return false;
+        }
+        
+    }
+    
+    // here 
+    public static boolean changePassword(String username, String newPassword) {
+    String sql = "UPDATE USERS SET password = ? WHERE name = ?";
+    
+    try (Connection conn = connect();
+         PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        
+        // In a real application, you should hash the password before storing it
+        String hashedPassword = newPassword ; // Implement this method
+        
+        pstmt.setString(1, hashedPassword); // new password (hashed)
+        pstmt.setString(2, username);       // username as key
+
+        int rowsUpdated = pstmt.executeUpdate();
+        
+        return rowsUpdated > 0; // true if password was updated successfully
+
+    } catch (SQLException e) {
+        e.printStackTrace();
+        return false;
+    }
+}
+     
+    
+    
+    
+    
+    
+    
+    public static boolean changeName(String oldName, String newName) {
+    String sql = "UPDATE USERS SET name = ? WHERE name = ?";
+    
+    try (Connection conn = connect();  // ← utilise ta méthode de connexion
+         PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        
+        pstmt.setString(1, newName);  // nouveau nom
+        pstmt.setString(2, oldName);  // ancien nom
+
+        int rowsUpdated = pstmt.executeUpdate();  // exécute la requête
+        
+        return rowsUpdated > 0;  // retourne true si au moins une ligne modifiée
+
+    } catch (SQLException e) {
+        e.printStackTrace();  // pour voir l'erreur dans la console
+        return false;
+    }
+}
+
+    
+    
+    
 
     public static boolean verifyAdmin(String name, String password) {
         String sql = "SELECT * FROM buvette.users WHERE name = ? AND password = ? AND type = 'admin'";
@@ -306,4 +376,7 @@ public class DB {
         }
         return plats;
     }
+    
+    
+   
 }

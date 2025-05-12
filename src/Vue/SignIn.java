@@ -7,10 +7,13 @@ import DB.DB;
 import java.awt.Dimension;
 import javax.swing.JButton;
 /**
- *
+ 
  * @author stof
  */
 public class SignIn extends javax.swing.JFrame {
+    //variable to stocker the informations of the user 
+    public static User user = new User() ;
+    
 
     /**
      * Creates new form Login
@@ -332,11 +335,12 @@ public class SignIn extends javax.swing.JFrame {
         // Login success
         // System.out.println("Login successful  (ᗒ‿ᗕ) ");
         jLabel1.setText("welcome user  (ᗒ‿ᗕ) ");
+        user.setName(username);
+        user.setPassword(password);
  
     
 javax.swing.Timer timer = new javax.swing.Timer(1500, e -> {
-   BuvetteApp buvetteApp= new BuvetteApp() 
-           ;
+   BuvetteApp1 buvetteApp= new BuvetteApp1() ;
 
    
    buvetteApp.setVisible(true);
