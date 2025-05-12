@@ -1,24 +1,42 @@
 package Vue;
-
-import DB.DB;
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.*;
-import java.awt.geom.RoundRectangle2D;
-import java.util.*;
-import java.util.List;
-import javax.swing.Timer;
     
-/**
- * Main application class for the Buvette Management System.
- */
-public class BuvetteApp1 extends JFrame {
+import DB.DB;
+import java.awt.BorderLayout;
+import java.awt.CardLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JPasswordField;
+import javax.swing.JScrollPane;
+import javax.swing.SwingUtilities;
 
+
+ 
+public class BuvetteApp1 extends JFrame {
     private CardLayout cardLayout;
     private JPanel cardPanel;
     private JPanel platsPanel;
     private List<Plat> menu;
     private Map<String, List<Plat>> menuData;
+    private LeftNavbar leftNavbar; // Added field
 
     public BuvetteApp1() {
         menu = new ArrayList<>();
@@ -37,20 +55,125 @@ public class BuvetteApp1 extends JFrame {
         setLocationRelativeTo(null);
         setExtendedState(JFrame.MAXIMIZED_BOTH);
 
+        // Création du conteneur principal
+        JPanel mainContainer = new JPanel(new BorderLayout());
+
+        // Initialisation du CardLayout pour le contenu dynamique
         cardLayout = new CardLayout();
         cardPanel = new JPanel(cardLayout);
 
+        // Création des différents panels
         JPanel homePanel = createHomePanel();
         JPanel loginPanel = createLoginPanel();
         JPanel adminPanel = createAdminPanel();
+        JPanel profilePanal = createProfilePanel();
+        //JPanel panierPanel = createPanierPanel();
 
+        // Ajout des panels au CardLayout
         cardPanel.add(homePanel, "Home");
         cardPanel.add(loginPanel, "Login");
         cardPanel.add(adminPanel, "Admin");
+        cardPanel.add(profilePanal, "Profile");
+        
+       // cardPanel.add(panierPanel, "Panier");
 
-        setContentPane(cardPanel);
+        // Création et configuration de la LeftNavbar
+        leftNavbar = new LeftNavbar(cardLayout, cardPanel); // Initialize the field
+        mainContainer.add(leftNavbar, BorderLayout.WEST);
+
+        // Configuration des actions de navigation
+        setupNavigationActions(leftNavbar);
+
+        // Ajout du cardPanel au centre
+        mainContainer.add(cardPanel, BorderLayout.CENTER);
+
+        // Configuration du content pane
+        setContentPane(mainContainer);
+
+        // Masquer le bouton admin par défaut
+        leftNavbar.setAdminVisibility(true);
+
+        // Afficher le panel Home par défaut et activer son bouton
         cardLayout.show(cardPanel, "Home");
+        leftNavbar.setActiveButton(leftNavbar.getHomeBtn());
     }
+
+    private JPanel createProfilePanel(){
+    return new Profile() ;
+            }
+    
+    
+    
+    private void setupNavigationActions(LeftNavbar navbar) {
+        // Home button
+        navbar.setHomeAction(e -> {
+            cardLayout.show(cardPanel, "Home");
+            navbar.setActiveButton(navbar.getHomebtn());
+        });
+
+        // Admin button
+        navbar.setAdminAction(e -> {
+            cardLayout.show(cardPanel, "Admin");
+            navbar.setActiveButton(navbar.getAdminBtn());
+        });
+
+        // Panier button
+        /*  navbar.setPanierAction(e -> {
+            cardLayout.show(cardPanel, "Panier");
+            navbar.setActiveButton(navbar.panierBtn);
+        });
+        */
+
+        // Logout button
+        navbar.setLogoutAction(e -> {
+    int confirmed = JOptionPane.showConfirmDialog(
+        null,
+        "Êtes-vous sûr de vouloir vous déconnecter ?",
+        "Confirmation de déconnexion",
+        JOptionPane.YES_NO_OPTION
+    );
+
+    if (confirmed == JOptionPane.YES_OPTION) {
+        // Logique de déconnexion
+        navbar.setAdminVisibility(false);
+        new SignIn().setVisible(true);
+        dispose();
+        cardLayout.show(cardPanel, "Login");
+        navbar.setActiveButton(null);
+    }
+});
+
+    }
+
+    public void onAdminLoginSuccess() {
+        leftNavbar.setAdminVisibility(true);
+        cardLayout.show(cardPanel, "Admin");
+        leftNavbar.setActiveButton(leftNavbar.getAdminBtn());
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     private void initializeMenuData() {
         if (menu.isEmpty()) {
@@ -94,7 +217,7 @@ public class BuvetteApp1 extends JFrame {
     }
 
     private JPanel createHomePanel() {
-        BackgroundPanel backgroundPanel = new BackgroundPanel("src/images/background.jpg");
+        BackgroundPanel backgroundPanel = new BackgroundPanel("src/images/py.png");
         backgroundPanel.setLayout(new BorderLayout());
 
         JPanel contentPanel = new JPanel(new BorderLayout());
@@ -103,7 +226,7 @@ public class BuvetteApp1 extends JFrame {
         JPanel headerPanel = new JPanel();
         headerPanel.setLayout(new BoxLayout(headerPanel, BoxLayout.Y_AXIS));
         headerPanel.setOpaque(false);
-
+/*
         JButton adminButton = new JButton("Espace Administrateur");
         adminButton.setPreferredSize(new Dimension(200, 50));
         adminButton.setBackground(new Color(0, 153, 255));
@@ -124,12 +247,14 @@ public class BuvetteApp1 extends JFrame {
                 adminButton.setBackground(new Color(0, 153, 255));
             }
         });
+        
+        */
         //JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         JPanel topPanel = new JPanel(new WrapLayout(FlowLayout.LEFT));
         topPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 200)); // or desired height// or RIGH  
         
         topPanel.setOpaque(false);
-        topPanel.add(adminButton);
+        //topPanel.add(adminButton);
         headerPanel.add(topPanel);
 
         JPanel categoriesPanel = createCategoryButtons();
@@ -487,8 +612,8 @@ public class BuvetteApp1 extends JFrame {
 
         backButtonLogin.addActionListener(e -> cardLayout.show(cardPanel, "Home"));
         return loginPanel;
-    }
-
+    } 
+    
     private JPanel createAdminPanel() {
         return new Admin(menu, menuData, cardLayout, cardPanel);
     }

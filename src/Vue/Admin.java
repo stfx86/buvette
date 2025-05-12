@@ -53,7 +53,7 @@ public class Admin extends JPanel {
 
     private void initializeUI() {
         setLayout(new BorderLayout(10, 10));
-        BackgroundPanel backgroundPanel = new BackgroundPanel("src/images/background.jpg");
+        BackgroundPanel backgroundPanel = new BackgroundPanel("src/images/py.png");
         backgroundPanel.setLayout(new BorderLayout(10, 10));
 
         // Form panel for adding/editing dishes
