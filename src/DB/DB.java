@@ -293,7 +293,7 @@ public class DB {
              ResultSet rs = stmt.executeQuery(sql)) {
             while (rs.next()) {
                 Plat plat = new Plat();
-                plat.setNom(rs.getString("naom"));
+                plat.setNom(rs.getString("nom"));
                 plat.setPrix(rs.getDouble("prix"));
                 plat.setDescription(rs.getString("descrp"));
                 plat.setCategorie(rs.getString("cat"));

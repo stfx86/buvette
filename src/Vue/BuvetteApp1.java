@@ -4,10 +4,8 @@ import DB.DB;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.awt.geom.RoundRectangle2D;
 import java.util.*;
 import java.util.List;
-import javax.swing.Timer;
     
 /**
  * Main application class for the Buvette Management System.
@@ -19,6 +17,8 @@ public class BuvetteApp1 extends JFrame {
     private JPanel platsPanel;
     private List<Plat> menu;
     private Map<String, List<Plat>> menuData;
+    // Create a panier
+//    Panier myPanier = new Panier();
 
     public BuvetteApp1() {
         menu = new ArrayList<>();
@@ -194,7 +194,16 @@ public class BuvetteApp1 extends JFrame {
             platsPanel.add(new JLabel("Aucun plat disponible pour cette catégorie"));
         } else {
             for (Plat plat : plats) {
-                JPanel card = PlatCardCreator.createPlatCard(plat);
+                //  JPanel card = PlatCardCreator.createPlatCard(plat);
+                  JPanel card = PlatCardCreator.createPlatCard(plat, new ActionListener() {
+                   @Override
+                    public void actionPerformed(ActionEvent e) {
+                       // Empty action listener - no code needed here
+                       
+//                       myPanier.addPlat(plat);
+                      }
+                    });
+
                 platsPanel.add(card);
             }
         }
