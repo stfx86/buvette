@@ -186,7 +186,7 @@ public class DB {
     }
 
     public static boolean addPlat(Plat plat) {
-        String sql = "INSERT INTO buvette.plat (naom, prix, descrp, cat, image) VALUES (?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO buvette.plat (nom, prix, descrp, cat, image) VALUES (?, ?, ?, ?, ?)";
         try (Connection conn = connect(); PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, plat.getNom());
             stmt.setDouble(2, plat.getPrix());
@@ -203,7 +203,7 @@ public class DB {
     }
 
     public static boolean updatePlat(Plat oldPlat, Plat newPlat) {
-        String sql = "UPDATE buvette.plat SET naom = ?, prix = ?, descrp = ?, cat = ?, image = ? WHERE naom = ?";
+        String sql = "UPDATE buvette.plat SET nom = ?, prix = ?, descrp = ?, cat = ?, image = ? WHERE nom = ?";
         try (Connection conn = connect(); PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, newPlat.getNom());
             stmt.setDouble(2, newPlat.getPrix());
@@ -359,7 +359,7 @@ public class DB {
     }
 
     public static boolean deletePlat(String nomp) {
-        String sql = "DELETE FROM buvette.plat WHERE naom = ?";
+        String sql = "DELETE FROM buvette.plat WHERE nom = ?";
         try (Connection conn = connect(); PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, nomp);
             int rowsAffected = stmt.executeUpdate();

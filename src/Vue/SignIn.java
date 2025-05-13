@@ -23,6 +23,7 @@ public class SignIn extends javax.swing.JFrame {
 
 //          setContentPane(backgroundPanel);1
                   initComponents();
+                  setLocationRelativeTo(null);  
     }
 
     /**
