@@ -13,7 +13,9 @@ public class LeftNavbar extends JPanel {
     // Navigation buttons
     private JButton homeBtn;
     private JButton adminBtn;
-    private JButton panierBtn;
+//    private JButton panierBtn;
+      JButton panierBtn;
+
     private JButton profileBtn;
     private JButton settingsBtn;
     private JButton logoutBtn;

@@ -102,7 +102,7 @@ public class Panier extends JPanel {
     private List<Plat> plats;
     private Map<Plat, Integer> platQuantities;
     private double totalPrice;
-
+public int a=222;
     private JPanel listPanel;
     private JScrollPane listScrollPane;
     private JLabel totalPriceLabel;
@@ -378,4 +378,21 @@ public class Panier extends JPanel {
         frame.setSize(900, 600);
         frame.setVisible(true);
     }
+    
+    
+    public void refresh() {
+    refreshList();
+    updateTotalPrice();
+    if (!plats.isEmpty()) {
+        showPlatDetails(plats.get(plats.size() - 1)); // Show details of the last added plat
+    } else {
+        // Clear details if panier is empty
+        nameLabel.setText("Name: ");
+        priceLabel.setText("Price: ");
+        descLabel.setText("Description: ");
+        categoryLabel.setText("Category: ");
+        imageLabel.setIcon(null);
+        currentlyDisplayedPlat = null;
+    }
+}
 }

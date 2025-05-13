@@ -38,6 +38,7 @@ public class BuvetteApp1 extends JFrame {
     private JPanel platsPanel;
     private List<Plat> menu;
     private Map<String, List<Plat>> menuData;
+      private  Panier panierPanel = new Panier();
 
     // Create a panier
 //    Panier myPanier = new Panier();
@@ -73,15 +74,14 @@ public class BuvetteApp1 extends JFrame {
         JPanel loginPanel = createLoginPanel();
         JPanel adminPanel = createAdminPanel();
         JPanel profilePanal = createProfilePanel();
-        //JPanel panierPanel = createPanierPanel();
+         panierPanel = (Panier)createPanierPanel();
 
         // Ajout des panels au CardLayout
         cardPanel.add(homePanel, "Home");
         cardPanel.add(loginPanel, "Login");
         cardPanel.add(adminPanel, "Admin");
-        cardPanel.add(profilePanal, "Profile");
-        
-       // cardPanel.add(panierPanel, "Panier");
+        cardPanel.add(profilePanal, "Profile");        
+        cardPanel.add(panierPanel, "Panier");
 
         // Création et configuration de la LeftNavbar
         leftNavbar = new LeftNavbar(cardLayout, cardPanel); // Initialize the field
@@ -103,6 +103,10 @@ public class BuvetteApp1 extends JFrame {
         cardLayout.show(cardPanel, "Home");
         leftNavbar.setActiveButton(leftNavbar.getHomeBtn());
     }
+   private JPanel createPanierPanel(){
+       
+       return this.panierPanel;
+   }
 
     private JPanel createProfilePanel(){
     return new Profile() ;
@@ -124,11 +128,16 @@ public class BuvetteApp1 extends JFrame {
         });
 
         // Panier button
-        /*  navbar.setPanierAction(e -> {
+          navbar.setPanierAction(e -> {
+              System.out.println("buttton action ");
+              System.out.println(panierPanel.a);
+              this.panierPanel.refresh();
             cardLayout.show(cardPanel, "Panier");
+                          this.panierPanel.refresh();
+
             navbar.setActiveButton(navbar.panierBtn);
         });
-        */
+        
 
         // Logout button
         navbar.setLogoutAction(e -> {
@@ -329,9 +338,12 @@ public class BuvetteApp1 extends JFrame {
                   JPanel card = PlatCardCreator.createPlatCard(plat, new ActionListener() {
                    @Override
                     public void actionPerformed(ActionEvent e) {
+                        
                        // Empty action listener - no code needed here
+                       System.out.println(".platt added");
                        
-//                       myPanier.addPlat(plat);
+//                       panierPanel.addPlat(plat);
+                            
                       }
                     });
 
