@@ -342,7 +342,7 @@ public class BuvetteApp1 extends JFrame {
                        // Empty action listener - no code needed here
                        System.out.println(".platt added");
                        
-//                       panierPanel.addPlat(plat);
+                       panierPanel.addPlat(plat);
                             
                       }
                     });
