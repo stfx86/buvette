@@ -83,7 +83,6 @@ public class SignIn extends javax.swing.JFrame {
         jPanel2.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 90, -1, 20));
 
         jLabel7.setFont(new java.awt.Font("Century Gothic", 0, 14)); // NOI18N
-        jLabel7.setForeground(new java.awt.Color(204, 204, 204));
         jPanel2.add(jLabel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 190, -1, -1));
 
         jSeparator1.setForeground(new java.awt.Color(255, 255, 255));
@@ -111,15 +110,14 @@ public class SignIn extends javax.swing.JFrame {
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setBackground(new java.awt.Color(204, 204, 204));
         setFont(new java.awt.Font("Adwaita Mono", 0, 18)); // NOI18N
+        setResizable(false);
 
         jPanel5.setBackground(new java.awt.Color(36, 47, 65));
 
         jLabel4.setFont(new java.awt.Font("Century Gothic", 1, 14)); // NOI18N
-        jLabel4.setForeground(new java.awt.Color(204, 204, 204));
         jLabel4.setText("user name");
 
         jLabel5.setFont(new java.awt.Font("Century Gothic", 1, 14)); // NOI18N
-        jLabel5.setForeground(new java.awt.Color(204, 204, 204));
         jLabel5.setText("PASSWORD");
 
         jSeparator2.setForeground(new java.awt.Color(255, 255, 255));
@@ -180,7 +178,6 @@ public class SignIn extends javax.swing.JFrame {
         jPanel4.add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 220, -1, 60));
 
         jLabel15.setFont(new java.awt.Font("Century Gothic", 0, 14)); // NOI18N
-        jLabel15.setForeground(new java.awt.Color(204, 204, 204));
         jPanel4.add(jLabel15, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 190, -1, -1));
 
         jSeparator7.setForeground(new java.awt.Color(255, 255, 255));
