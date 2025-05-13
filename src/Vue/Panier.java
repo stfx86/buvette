@@ -9,10 +9,10 @@ import java.util.List;
 
 public class Panier extends JPanel {
     // Color scheme
-    private static final Color PRIMARY_COLOR = new Color(40, 167, 69);
+
+      private static final Color PRIMARY_COLOR = new Color(40, 167, 69);
     private static final Color SECONDARY_COLOR = new Color(33, 37, 41);
-    private static final Color BACKGROUND_COLOR = new Color(248, 249, 250);
-    private static final Color CARD_COLOR = Color.WHITE;
+    private static final Color CARD_COLOR = new Color(255, 255, 255, 200);
     private static final Color TEXT_COLOR = new Color(73, 80, 87);
 
     // Data structures
@@ -30,55 +30,89 @@ public class Panier extends JPanel {
     private Plat currentlyDisplayedPlat;
 
     public Panier() {
-        initializeUI();
-        setupEventHandlers();
+        // Set up main layout
+        setLayout(new BorderLayout());
+        setOpaque(false);
+        
+        // Create background panel
+        BackgroundPanel backgroundPanel = new BackgroundPanel("src/images/py.png");
+        backgroundPanel.setLayout(new BorderLayout(10, 10));
+        
+        // Initialize UI components
+        initializeUIComponents();
+        
+        // Create content panel with all components
+        JPanel contentPanel = createContentPanel();
+        contentPanel.setOpaque(false);
+        
+        // Add content to background panel
+        backgroundPanel.add(contentPanel, BorderLayout.CENTER);
+        
+        // Add background panel to main panel
+        add(backgroundPanel, BorderLayout.CENTER);
     }
 
-    private void initializeUI() {
-        // Main panel setup
-        setLayout(new BorderLayout(10, 10));
-        setBackground(BACKGROUND_COLOR);
-        setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
+    private void initializeUIComponents() {
+        // Initialize all your components here
+        totalPriceLabel = new JLabel("Total: 0.00€", SwingConstants.RIGHT);
+        totalPriceLabel.setFont(new Font("Segoe UI", Font.BOLD, 18));
+        totalPriceLabel.setForeground(Color.WHITE);
+
+        listPanel = new JPanel();
+        listPanel.setLayout(new BoxLayout(listPanel, BoxLayout.Y_AXIS));
+        listPanel.setOpaque(false);
+
+        listScrollPane = new JScrollPane(listPanel);
+        listScrollPane.setOpaque(false);
+        listScrollPane.getViewport().setOpaque(false);
+        listScrollPane.setBorder(BorderFactory.createTitledBorder(
+                BorderFactory.createLineBorder(new Color(255, 255, 255, 150)),
+                "Your Cart",
+                TitledBorder.LEFT,
+                TitledBorder.TOP,
+                new Font("Segoe UI", Font.BOLD, 14),
+                Color.WHITE
+        ));
+
+        // Initialize detail panel components
+        imageLabel = new JLabel();
+        imageLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        nameLabel = createDetailLabel("", Font.BOLD, 18);
+        priceLabel = createDetailLabel("", Font.PLAIN, 16);
+        priceLabel.setForeground(PRIMARY_COLOR);
+        categoryLabel = createDetailLabel("", Font.ITALIC, 14);
+        descLabel = createDetailLabel("", Font.PLAIN, 14);
+        descLabel.setVerticalAlignment(SwingConstants.TOP);
+    }
+
+    private JPanel createContentPanel() {
+        JPanel contentPanel = new JPanel(new BorderLayout(10, 10));
+        contentPanel.setOpaque(false);
 
         // Header Panel
         JPanel headerPanel = new JPanel(new BorderLayout());
-        headerPanel.setBackground(BACKGROUND_COLOR);
+        headerPanel.setOpaque(false);
         headerPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 10, 0));
-        
-        totalPriceLabel = new JLabel("Total: 0.00€", SwingConstants.RIGHT);
-        totalPriceLabel.setFont(new Font("Segoe UI", Font.BOLD, 18));
-        totalPriceLabel.setForeground(SECONDARY_COLOR);
         headerPanel.add(totalPriceLabel, BorderLayout.EAST);
-        add(headerPanel, BorderLayout.NORTH);
+        contentPanel.add(headerPanel, BorderLayout.NORTH);
 
         // Main Content (Split Pane)
         JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
         splitPane.setResizeWeight(0.5);
         splitPane.setDividerLocation(0.5);
+        splitPane.setOpaque(false);
         splitPane.setBorder(null);
 
         // Left Panel - Cart Items
-        listPanel = new JPanel();
-        listPanel.setLayout(new BoxLayout(listPanel, BoxLayout.Y_AXIS));
-        listPanel.setBackground(BACKGROUND_COLOR);
-        
-        listScrollPane = new JScrollPane(listPanel);
-        listScrollPane.setBorder(BorderFactory.createTitledBorder(
-            BorderFactory.createLineBorder(Color.LIGHT_GRAY),
-            "Your Cart",
-            TitledBorder.LEFT,
-            TitledBorder.TOP,
-            new Font("Segoe UI", Font.BOLD, 14),
-            SECONDARY_COLOR
-        ));
         listScrollPane.getVerticalScrollBar().setUnitIncrement(16);
+        splitPane.setLeftComponent(listScrollPane);
 
         // Right Panel - Item Details
         detailPanel = new JPanel(new GridBagLayout());
-        detailPanel.setBackground(CARD_COLOR);
+        detailPanel.setBackground(new Color(255, 255, 255, 200));
         detailPanel.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(new Color(222, 226, 230)),
-            BorderFactory.createEmptyBorder(15, 15, 15, 15)
+                BorderFactory.createLineBorder(new Color(255, 255, 255, 180)),
+                BorderFactory.createEmptyBorder(15, 15, 15, 15)
         ));
 
         GridBagConstraints gbc = new GridBagConstraints();
@@ -86,9 +120,6 @@ public class Panier extends JPanel {
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.anchor = GridBagConstraints.WEST;
 
-        // Image
-        imageLabel = new JLabel();
-        imageLabel.setHorizontalAlignment(SwingConstants.CENTER);
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.gridwidth = 2;
@@ -96,61 +127,41 @@ public class Panier extends JPanel {
         gbc.fill = GridBagConstraints.BOTH;
         detailPanel.add(imageLabel, gbc);
 
-        // Name
-        nameLabel = createDetailLabel("", Font.BOLD, 18);
         gbc.gridy = 1;
         gbc.gridwidth = 2;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         detailPanel.add(nameLabel, gbc);
 
-        // Price
-        priceLabel = createDetailLabel("", Font.PLAIN, 16);
-        priceLabel.setForeground(PRIMARY_COLOR);
         gbc.gridy = 2;
         detailPanel.add(priceLabel, gbc);
 
-        // Category
-        categoryLabel = createDetailLabel("", Font.ITALIC, 14);
         gbc.gridy = 3;
         detailPanel.add(categoryLabel, gbc);
 
-        // Description
-        descLabel = createDetailLabel("", Font.PLAIN, 14);
-        descLabel.setVerticalAlignment(SwingConstants.TOP);
         gbc.gridy = 4;
         gbc.weighty = 1.0;
         gbc.fill = GridBagConstraints.BOTH;
         detailPanel.add(new JScrollPane(descLabel), gbc);
 
-        // Responsive image resizing
-        detailPanel.addComponentListener(new ComponentAdapter() {
-            public void componentResized(ComponentEvent e) {
-                if (currentlyDisplayedPlat != null) {
-                    updateImage(currentlyDisplayedPlat);
-                }
-            }
-        });
-
-        splitPane.setLeftComponent(listScrollPane);
         splitPane.setRightComponent(detailPanel);
-        add(splitPane, BorderLayout.CENTER);
+        contentPanel.add(splitPane, BorderLayout.CENTER);
 
         // Footer Panel
         JPanel footerPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 10));
-        footerPanel.setBackground(BACKGROUND_COLOR);
+        footerPanel.setOpaque(false);
         footerPanel.setBorder(BorderFactory.createEmptyBorder(10, 0, 0, 0));
 
-        JButton removeButton = createActionButton("Remove Item", new Color(220, 53, 69));
+        JButton removeButton = createActionButton("Remove Item", new Color(220, 53, 69, 200));
         removeButton.addActionListener(e -> {
             if (!plats.isEmpty()) {
                 removePlat(plats.get(plats.size() - 1));
             }
         });
 
-        JButton checkoutButton = createActionButton("Checkout", PRIMARY_COLOR);
+        JButton checkoutButton = createActionButton("Checkout", new Color(40, 167, 69, 200));
         checkoutButton.addActionListener(e -> generateFacture());
 
-        JButton clearButton = createActionButton("Clear Cart", SECONDARY_COLOR);
+        JButton clearButton = createActionButton("Clear Cart", new Color(33, 37, 41, 200));
         clearButton.addActionListener(e -> {
             plats.clear();
             platQuantities.clear();
@@ -161,22 +172,42 @@ public class Panier extends JPanel {
         footerPanel.add(removeButton);
         footerPanel.add(clearButton);
         footerPanel.add(checkoutButton);
-        add(footerPanel, BorderLayout.SOUTH);
+        contentPanel.add(footerPanel, BorderLayout.SOUTH);
+
+        return contentPanel;
     }
 
+ 
+    
+    
+    
+    
+    
+    
+    
+    
+    
     private JButton createActionButton(String text, Color bgColor) {
         JButton button = new JButton(text);
         button.setFont(new Font("Segoe UI", Font.BOLD, 14));
         button.setForeground(Color.WHITE);
         button.setBackground(bgColor);
         button.setFocusPainted(false);
-        button.setBorder(BorderFactory.createEmptyBorder(8, 20, 8, 20));
+        button.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(new Color(255, 255, 255, 150)),
+                BorderFactory.createEmptyBorder(8, 20, 8, 20)
+        ));
         button.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        
+
         button.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseEntered(MouseEvent e) {
-                button.setBackground(bgColor.darker());
+                button.setBackground(new Color(
+                        bgColor.getRed(),
+                        bgColor.getGreen(),
+                        bgColor.getBlue(),
+                        230 // More opaque on hover
+                ));
             }
 
             @Override
@@ -184,14 +215,14 @@ public class Panier extends JPanel {
                 button.setBackground(bgColor);
             }
         });
-        
+
         return button;
     }
 
     private JLabel createDetailLabel(String text, int style, int size) {
         JLabel label = new JLabel(text);
         label.setFont(new Font("Segoe UI", style, size));
-        label.setForeground(TEXT_COLOR);
+        label.setForeground(SECONDARY_COLOR);
         return label;
     }
 
@@ -207,7 +238,9 @@ public class Panier extends JPanel {
     }
 
     public boolean removePlat(Plat plat) {
-        if (!platQuantities.containsKey(plat)) return false;
+        if (!platQuantities.containsKey(plat)) {
+            return false;
+        }
 
         int quantity = platQuantities.get(plat);
         if (quantity > 1) {
@@ -256,8 +289,8 @@ public class Panier extends JPanel {
         JPanel itemPanel = new JPanel(new BorderLayout(10, 0));
         itemPanel.setBackground(CARD_COLOR);
         itemPanel.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createMatteBorder(0, 0, 1, 0, new Color(222, 226, 230)),
-            BorderFactory.createEmptyBorder(10, 15, 10, 15)
+                BorderFactory.createMatteBorder(0, 0, 1, 0, new Color(222, 226, 230)),
+                BorderFactory.createEmptyBorder(10, 15, 10, 15)
         ));
         itemPanel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         itemPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 80));
@@ -400,7 +433,9 @@ public class Panier extends JPanel {
         int maxWidth = (int) (detailPanel.getWidth() * 0.8);
         int maxHeight = (int) (detailPanel.getHeight() * 0.4);
 
-        if (maxWidth <= 0 || maxHeight <= 0) return;
+        if (maxWidth <= 0 || maxHeight <= 0) {
+            return;
+        }
 
         Image img = icon.getImage();
         Image scaled = img.getScaledInstance(maxWidth, maxHeight, Image.SCALE_SMOOTH);
@@ -409,10 +444,10 @@ public class Panier extends JPanel {
 
     private void generateFacture() {
         if (plats.isEmpty()) {
-            JOptionPane.showMessageDialog(this, 
-                "Your cart is empty. Add items before checkout.", 
-                "Empty Cart", 
-                JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(this,
+                    "Your cart is empty. Add items before checkout.",
+                    "Empty Cart",
+                    JOptionPane.INFORMATION_MESSAGE);
             return;
         }
 
@@ -436,14 +471,14 @@ public class Panier extends JPanel {
         JTextArea textArea = new JTextArea(receipt.toString());
         textArea.setEditable(false);
         textArea.setFont(new Font("Monospaced", Font.PLAIN, 14));
-        
+
         JScrollPane scrollPane = new JScrollPane(textArea);
         scrollPane.setPreferredSize(new Dimension(500, 350));
 
         JOptionPane.showMessageDialog(this, scrollPane, "Order Receipt", JOptionPane.PLAIN_MESSAGE);
     }
 
-    public static void main(String[] args) {
+     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
             try {
                 UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
@@ -454,15 +489,19 @@ public class Panier extends JPanel {
             JFrame frame = new JFrame("Shopping Cart");
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             
-            // Create sample data for testing
-            Panier panier = new Panier();
+            // Create background panel with your image
+            BackgroundPanel backgroundPanel = new BackgroundPanel("src/images/py.png");
+            backgroundPanel.setLayout(new BorderLayout());
             
-            // Add sample dishes (you'll need to create these image files or adjust paths)
+            // Create and add the Panier panel
+            Panier panier = new Panier();
+            backgroundPanel.add(panier, BorderLayout.CENTER);
+            
+            // Add sample dishes
             panier.addPlat(new Plat("Pizza Margherita", 12.99, "Classic tomato and mozzarella", "Italian", "images/pizza.jpg"));
             panier.addPlat(new Plat("Caesar Salad", 8.99, "Fresh romaine with Caesar dressing", "Salad", "images/salad.jpg"));
-            panier.addPlat(new Plat("Chocolate Cake", 6.50, "Rich chocolate dessert", "Dessert", "images/cake.jpg"));
             
-            frame.add(panier);
+            frame.add(backgroundPanel);
             frame.setSize(1000, 700);
             frame.setMinimumSize(new Dimension(800, 600));
             frame.setLocationRelativeTo(null);
@@ -470,3 +509,4 @@ public class Panier extends JPanel {
         });
     }
 }
+
