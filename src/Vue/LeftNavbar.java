@@ -3,16 +3,17 @@ package Vue;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.awt.geom.RoundRectangle2D;
 import javax.swing.border.AbstractBorder;
-import java.awt.image.BufferedImage;
-import javax.imageio.ImageIO;
-import java.io.IOException;
 
 public class LeftNavbar extends JPanel {
     // Navigation buttons
     private JButton homeBtn;
+    
+    
     private JButton adminBtn;
+      
+
+  
 //    private JButton panierBtn;
       JButton panierBtn;
 

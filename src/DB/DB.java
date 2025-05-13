@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DB {
+
     private static String URL;
     private static String USER;
     private static String PASSWORD;
@@ -61,75 +62,92 @@ public class DB {
             return false;
         }
     }
-    
-    
-    public static boolean chekPassword(String name , String password){
-        String sql = "SELECT password from users WHERE name = ?" ;
-        
+
+    public static boolean chekPassword(String name, String password) {
+        String sql = "SELECT password from users WHERE name = ?";
+
         try (Connection conn = connect(); PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, name);
-           
+
             try (ResultSet rs = stmt.executeQuery()) {
-                return(password.equals(rs)) ;
+                return (password.equals(rs));
             }
         } catch (SQLException e) {
             System.out.println("Error verifying admin:");
             e.printStackTrace();
             return false;
         }
-        
+
     }
-    
+
     // here 
     public static boolean changePassword(String username, String newPassword) {
-    String sql = "UPDATE USERS SET password = ? WHERE name = ?";
-    
-    try (Connection conn = connect();
-         PreparedStatement pstmt = conn.prepareStatement(sql)) {
-        
-        // In a real application, you should hash the password before storing it
-        String hashedPassword = newPassword ; // Implement this method
-        
-        pstmt.setString(1, hashedPassword); // new password (hashed)
-        pstmt.setString(2, username);       // username as key
+        String sql = "UPDATE USERS SET password = ? WHERE name = ?";
 
-        int rowsUpdated = pstmt.executeUpdate();
-        
-        return rowsUpdated > 0; // true if password was updated successfully
+        try (Connection conn = connect(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
-    } catch (SQLException e) {
-        e.printStackTrace();
-        return false;
+            // In a real application, you should hash the password before storing it
+            String hashedPassword = newPassword; // Implement this method
+
+            pstmt.setString(1, hashedPassword); // new password (hashed)
+            pstmt.setString(2, username);       // username as key
+
+            int rowsUpdated = pstmt.executeUpdate();
+
+            return rowsUpdated > 0; // true if password was updated successfully
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
     }
-}
-     
-    
-    
-    
-    
-    
-    
+
     public static boolean changeName(String oldName, String newName) {
-    String sql = "UPDATE USERS SET name = ? WHERE name = ?";
-    
-    try (Connection conn = connect();  // ← utilise ta méthode de connexion
-         PreparedStatement pstmt = conn.prepareStatement(sql)) {
-        
-        pstmt.setString(1, newName);  // nouveau nom
-        pstmt.setString(2, oldName);  // ancien nom
+        String sql = "UPDATE USERS SET name = ? WHERE name = ?";
 
-        int rowsUpdated = pstmt.executeUpdate();  // exécute la requête
-        
-        return rowsUpdated > 0;  // retourne true si au moins une ligne modifiée
+        try (Connection conn = connect(); // ← utilise ta méthode de connexion
+                 PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
-    } catch (SQLException e) {
-        e.printStackTrace();  // pour voir l'erreur dans la console
-        return false;
+            pstmt.setString(1, newName);  // nouveau nom
+            pstmt.setString(2, oldName);  // ancien nom
+
+            int rowsUpdated = pstmt.executeUpdate();  // exécute la requête
+
+            return rowsUpdated > 0;  // retourne true si au moins une ligne modifiée
+
+        } catch (SQLException e) {
+            e.printStackTrace();  // pour voir l'erreur dans la console
+            return false;
+        }
     }
+
+   
+    
+    public static boolean isAdmin(String name, String password) {
+    String sql = "SELECT * FROM buvette.users WHERE name = ? AND password = ?";
+    try (Connection conn = connect(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+        stmt.setString(1, name);
+        stmt.setString(2, password);
+        try (ResultSet rs = stmt.executeQuery()) {
+            if (rs.next()) {
+                return rs.getString("type").equals("admin");
+            }
+        }
+    } catch (SQLException e) {
+        System.out.println("Error verifying admin:");
+        e.printStackTrace();
+    }
+    return false;
 }
 
     
     
+    
+    
+    
+    
+    
+
     
 
     public static boolean verifyAdmin(String name, String password) {
@@ -152,7 +170,6 @@ public class DB {
     }
 
     // ======== USERS METHODS ========
-
     public static boolean addUser(String name, String password, String type) {
         String sql = "INSERT INTO buvette.users (name, password, TYPE) VALUES (?, ?, ?)";
         try (Connection conn = connect(); PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -273,7 +290,6 @@ public class DB {
     }
 
     // ======== PLATS METHODS ========
-
     public static boolean addPlat(String nomp, String descp, float prixp, byte[] imgp, String catp, Boolean disp) {
         String sql = "INSERT INTO buvette.plats (nomp, descp, prixp, imgp, catp, disp) VALUES (?, ?, ?, ?, ?, ?)";
         try (Connection conn = connect(); PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -358,9 +374,7 @@ public class DB {
     public static List<Plat> listPlats() {
         String sql = "SELECT * FROM buvette.plat";
         List<Plat> plats = new ArrayList<>();
-        try (Connection conn = connect();
-             Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
+        try (Connection conn = connect(); Statement stmt = conn.createStatement(); ResultSet rs = stmt.executeQuery(sql)) {
             while (rs.next()) {
                 Plat plat = new Plat();
                 plat.setNom(rs.getString("nom"));
@@ -376,7 +390,5 @@ public class DB {
         }
         return plats;
     }
-    
-    
-   
+
 }

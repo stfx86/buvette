@@ -38,7 +38,11 @@ public class BuvetteApp1 extends JFrame {
     private JPanel platsPanel;
     private List<Plat> menu;
     private Map<String, List<Plat>> menuData;
-      private  Panier panierPanel = new Panier();
+   
+   
+   private  Panier panierPanel = new Panier();  
+   
+    
 
     // Create a panier
 //    Panier myPanier = new Panier();
@@ -74,7 +78,7 @@ public class BuvetteApp1 extends JFrame {
         JPanel loginPanel = createLoginPanel();
         JPanel adminPanel = createAdminPanel();
         JPanel profilePanal = createProfilePanel();
-         panierPanel = (Panier)createPanierPanel();
+        panierPanel = (Panier)createPanierPanel();
 
         // Ajout des panels au CardLayout
         cardPanel.add(homePanel, "Home");
@@ -124,16 +128,23 @@ public class BuvetteApp1 extends JFrame {
         // Admin button
         navbar.setAdminAction(e -> {
             cardLayout.show(cardPanel, "Admin");
+            
             navbar.setActiveButton(navbar.getAdminBtn());
+            
+            
         });
+        if(!DB.isAdmin(SignIn.user.getName(), SignIn.user.getPassword())){
+             navbar.getAdminBtn().setEnabled(false);
+        }
+         
 
         // Panier button
           navbar.setPanierAction(e -> {
               System.out.println("buttton action ");
-              System.out.println(panierPanel.a);
-              this.panierPanel.refresh();
+              
+           
             cardLayout.show(cardPanel, "Panier");
-                          this.panierPanel.refresh();
+                         
 
             navbar.setActiveButton(navbar.panierBtn);
         });
@@ -234,7 +245,7 @@ public class BuvetteApp1 extends JFrame {
     private JPanel createHomePanel() {
         BackgroundPanel backgroundPanel = new BackgroundPanel("src/images/py.png");
         backgroundPanel.setLayout(new BorderLayout());
-
+          
         JPanel contentPanel = new JPanel(new BorderLayout());
         contentPanel.setOpaque(false);
 
@@ -342,7 +353,9 @@ public class BuvetteApp1 extends JFrame {
                        // Empty action listener - no code needed here
                        System.out.println(".platt added");
                        
-                       panierPanel.addPlat(plat);
+
+                      panierPanel.addPlat(plat);
+
                             
                       }
                     });
