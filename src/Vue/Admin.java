@@ -1,3 +1,4 @@
+
 package Vue;
 
 import DB.DB;
@@ -401,4 +402,5 @@ public class Admin extends JPanel {
         imgPathLabel.setText("Aucune image sélectionnée");
         imgPathLabel.setToolTipText(null);
     }
+
 }
