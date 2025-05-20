@@ -6,9 +6,13 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.IOException;
+import java.net.URL;
 import java.util.*;
 import java.util.List;
+import javax.imageio.ImageIO;
 
 /**
  * Standalone class for the admin panel, handling dish management with database integration.
@@ -157,6 +161,44 @@ public class Admin extends JPanel {
                 imgPathLabel.setToolTipText(selectedImagePath); // Full path in tooltip
             }
         });
+        
+        
+        
+        
+             //lets add an url imag based 
+        JButton chooseImageUrlButton = new JButton("url instead");
+         styleButton(chooseImageUrlButton);
+         imgPanel.add(chooseImageUrlButton);
+         imgPanel.add(imgPathLabel);
+         
+       chooseImageUrlButton.addActionListener(e -> {
+    String imageUrl = JOptionPane.showInputDialog(null, "Entrez l'URL de l'image :", "Choisir Image par URL", JOptionPane.PLAIN_MESSAGE);
+    
+    if (imageUrl != null && !imageUrl.trim().isEmpty()) {
+        try {
+            URL url = new URL(imageUrl);
+            BufferedImage image = ImageIO.read(url);
+            if (image != null) {
+                // Save to a temporary file
+                File tempFile = File.createTempFile("downloaded_image_", ".png");
+                ImageIO.write(image, "png", tempFile);
+                
+                selectedImagePath = tempFile.getAbsolutePath();
+                imgPathLabel.setText(tempFile.getName());
+                imgPathLabel.setToolTipText(selectedImagePath);
+            } else {
+                JOptionPane.showMessageDialog(null, "L'image n'a pas pu être chargée depuis l'URL fournie.", "Erreur", JOptionPane.ERROR_MESSAGE);
+            }
+        } catch (IOException ex) {
+            JOptionPane.showMessageDialog(null, "URL invalide ou problème lors du téléchargement de l'image.", "Erreur", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+});
+
+        
+        
+        
+        
 
         // Buttons for form actions
         JPanel formButtonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));

@@ -3,7 +3,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
 package Vue;
-
+import Ai.FloatingChatIcon;
 import java.awt.BorderLayout;
 
 /**
@@ -25,7 +25,7 @@ public class Tst extends javax.swing.JFrame {
         
         // Create an instance of Panier
         Panier itemPanel = new Panier();
-        
+        ;
         // Add the dummy plats to the panier
         itemPanel.addPlat(plat1);
         itemPanel.addPlat(plat2);
@@ -37,7 +37,7 @@ public class Tst extends javax.swing.JFrame {
         
         // Set the size of the frame
         this.setSize(500, 400); // You can change the size to suit your 
-
+   FloatingChatIcon chatIcon = new FloatingChatIcon(this);
         
     }
 
