@@ -1,5 +1,6 @@
 package Vue;
 
+import Ai.FloatingChatIcon;
 import DB.DB;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
@@ -57,6 +58,9 @@ public class BuvetteApp1 extends JFrame {
         initializeMenuData();
         initializeUI();
         this.setMinimumSize(new Dimension(999,999));
+        
+        FloatingChatIcon chatIcon = new FloatingChatIcon(this);
+      
     }
 
     private void initializeUI() {
