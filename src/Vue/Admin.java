@@ -171,6 +171,10 @@ public class Admin extends JPanel {
          imgPanel.add(chooseImageUrlButton);
          imgPanel.add(imgPathLabel);
          
+         
+         
+         
+         
        chooseImageUrlButton.addActionListener(e -> {
     String imageUrl = JOptionPane.showInputDialog(null, "Entrez l'URL de l'image :", "Choisir Image par URL", JOptionPane.PLAIN_MESSAGE);
     

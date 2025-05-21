@@ -1,12 +1,14 @@
 package DB;
+import Vue.* ;
 
-import Vue.*;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class DB {
 
@@ -142,6 +144,53 @@ public class DB {
 
     
     
+    public static List<String> getUsersEmails() {
+    List<String> emails = new ArrayList<>();
+    String sql = "SELECT email FROM buvette.users WHERE email IS NOT NULL";
+    
+    try (Connection conn = connect();
+         PreparedStatement pstmt = conn.prepareStatement(sql);
+         ResultSet rs = pstmt.executeQuery()) {
+        
+        while (rs.next()) {
+            String email = rs.getString("email");
+            if (email != null && !email.trim().isEmpty()) {
+                emails.add(email.trim());
+            }
+        }
+    } catch (SQLException e) {
+        System.err.println("Error fetching user emails: " + e.getMessage());
+        // Vous pourriez aussi logger cette erreur
+    }
+    
+    return emails;
+}
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     
     
     
@@ -186,39 +235,72 @@ public class DB {
     }
 
     public static boolean addPlat(Plat plat) {
-        String sql = "INSERT INTO buvette.plat (nom, prix, descrp, cat, image) VALUES (?, ?, ?, ?, ?)";
-        try (Connection conn = connect(); PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setString(1, plat.getNom());
-            stmt.setDouble(2, plat.getPrix());
-            stmt.setString(3, plat.getDescription());
-            stmt.setString(4, plat.getCategorie());
-            stmt.setString(5, plat.getImagePath());
-            stmt.executeUpdate();
-            return true;
-        } catch (SQLException e) {
-            System.out.println("Error adding plat:");
-            e.printStackTrace();
-            return false;
+    String sql = "INSERT INTO buvette.plat (nom, prix, descrp, cat, image) VALUES (?, ?, ?, ?, ?)";
+    try (Connection conn = connect(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+        // Insertion du plat dans la base de données
+        stmt.setString(1, plat.getNom());
+        stmt.setDouble(2, plat.getPrix());
+        stmt.setString(3, plat.getDescription());
+        stmt.setString(4, plat.getCategorie());
+        stmt.setString(5, plat.getImagePath());
+        stmt.executeUpdate();
+        
+        // Récupération des emails des utilisateurs
+        List<String> emails = getUsersEmails();
+        
+        // Récupération des noms d'utilisateurs associés aux emails
+        Map<String, String> userEmailsWithNames = getUsersEmailsWithNames();
+        
+       
+        
+        // Envoi d'email à chaque utilisateur
+        for (String em : emails) {
+            String userName = userEmailsWithNames.getOrDefault(em, "Client");
+            String  Email = "Nouveau plat ajouté: " + plat.getNom()+
+                "Bonjour " + userName + ",\n\n" +
+                "Un nouveau plat a été ajouté à notre menu:\n" +
+                "Nom: " + plat.getNom() + "\n" +
+                "Prix: " + plat.getPrix() + " DH\n" +
+                "Catégorie: " + plat.getCategorie() + "\n\n" +
+                "Cordialement,\nL'équipe de la Buvette" ;
+            
+            
+            email.SendEmail.envoyerEmail(em , Email) ;
+                
+                
+           
         }
+        
+        return true;
+    } catch (SQLException e) {
+        System.out.println("Error adding plat:");
+        e.printStackTrace();
+        return false;
     }
+}
 
-    public static boolean updatePlat(Plat oldPlat, Plat newPlat) {
-        String sql = "UPDATE buvette.plat SET nom = ?, prix = ?, descrp = ?, cat = ?, image = ? WHERE nom = ?";
-        try (Connection conn = connect(); PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setString(1, newPlat.getNom());
-            stmt.setDouble(2, newPlat.getPrix());
-            stmt.setString(3, newPlat.getDescription());
-            stmt.setString(4, newPlat.getCategorie());
-            stmt.setString(5, newPlat.getImagePath());
-            stmt.setString(6, oldPlat.getNom());
-            int rowsAffected = stmt.executeUpdate();
-            return rowsAffected > 0;
-        } catch (SQLException e) {
-            System.out.println("Error updating plat:");
-            e.printStackTrace();
-            return false;
+// Méthode pour récupérer les emails avec les noms d'utilisateurs
+public static Map<String, String> getUsersEmailsWithNames() {
+    Map<String, String> emailNameMap = new HashMap<>();
+    String sql = "SELECT name, email FROM users WHERE email IS NOT NULL";
+    
+    try (Connection conn = connect();
+         PreparedStatement pstmt = conn.prepareStatement(sql);
+         ResultSet rs = pstmt.executeQuery()) {
+        
+        while (rs.next()) {
+            String name = rs.getString("name");
+            String email = rs.getString("email");
+            if (email != null && !email.trim().isEmpty()) {
+                emailNameMap.put(email, name);
+            }
         }
+    } catch (SQLException e) {
+        System.err.println("Error fetching user emails with names: " + e.getMessage());
     }
+    
+    return emailNameMap;
+}
 
     public static ResultSet getUser(String name) {
         String sql = "SELECT * FROM buvette.users WHERE name = ?";
@@ -290,6 +372,44 @@ public class DB {
     }
 
     // ======== PLATS METHODS ========
+    
+    
+     public static boolean updatePlat(Plat oldPlat, Plat newPlat) {
+        String sql = "UPDATE buvette.plat SET nom = ?, prix = ?, descrp = ?, cat = ?, image = ? WHERE nom = ?";
+        try (Connection conn = connect(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, newPlat.getNom());
+            stmt.setDouble(2, newPlat.getPrix());
+            stmt.setString(3, newPlat.getDescription());
+            stmt.setString(4, newPlat.getCategorie());
+            stmt.setString(5, newPlat.getImagePath());
+            stmt.setString(6, oldPlat.getNom());
+            int rowsAffected = stmt.executeUpdate();
+            return rowsAffected > 0;
+        } catch (SQLException e) {
+            System.out.println("Error updating plat:");
+            e.printStackTrace();
+            return false;
+        }
+    }
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     public static boolean addPlat(String nomp, String descp, float prixp, byte[] imgp, String catp, Boolean disp) {
         String sql = "INSERT INTO buvette.plats (nomp, descp, prixp, imgp, catp, disp) VALUES (?, ?, ?, ?, ?, ?)";
         try (Connection conn = connect(); PreparedStatement stmt = conn.prepareStatement(sql)) {
