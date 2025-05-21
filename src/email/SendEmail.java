@@ -7,6 +7,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Calendar;
 
 /**
  * Service complet de notification email pour la buvette
@@ -146,3 +147,4 @@ public class SendEmail {
         }
     }
 }
+
