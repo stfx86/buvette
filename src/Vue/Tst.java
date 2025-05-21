@@ -2,9 +2,16 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
+
+//package Application;
 package Vue;
 import Ai.FloatingChatIcon;
 import java.awt.BorderLayout;
+
+import Vue.Panier;
+import Vue.Plat;
+import java.awt.BorderLayout;
+import Application.MainPrincipal;
 
 /**
  *
@@ -37,7 +44,14 @@ public class Tst extends javax.swing.JFrame {
         
         // Set the size of the frame
         this.setSize(500, 400); // You can change the size to suit your 
+
    FloatingChatIcon chatIcon = new FloatingChatIcon(this);
+
+        //
+      
+        //
+//MainPrincipal.main(new String[0]);
+
         
     }
 

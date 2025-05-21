@@ -142,7 +142,7 @@ public class Admin extends JPanel {
         imgPathLabel.setForeground(Color.WHITE);
         imgPathLabel.setFont(new Font("Arial", Font.PLAIN, 14));
         imgPanel.add(chooseImageButton);
-        imgPanel.add(imgPathLabel);
+//        imgPanel.add(imgPathLabel);
         gbc.gridx = 1;
         gbc.gridy = 4;
         formPanel.add(imgPanel, gbc);
@@ -163,9 +163,7 @@ public class Admin extends JPanel {
         });
         
         
-        
-        
-             //lets add an url imag based 
+
         JButton chooseImageUrlButton = new JButton("url instead");
          styleButton(chooseImageUrlButton);
          imgPanel.add(chooseImageUrlButton);
@@ -195,11 +193,13 @@ public class Admin extends JPanel {
     }
 });
 
-        
-        
-        
-        
 
+        
+        
+        
+        //
+        
+        
         // Buttons for form actions
         JPanel formButtonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         formButtonPanel.setOpaque(false);
