@@ -1,12 +1,16 @@
 package email ;
 
+import com.sun.jdi.connect.Transport;
 import jakarta.mail.*;
 import jakarta.mail.internet.*;
+import java.net.Authenticator;
+import java.net.PasswordAuthentication;
 import java.util.Properties;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Calendar;
 
 /**
  * Service complet de notification email pour la buvette
