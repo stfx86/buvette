@@ -30,7 +30,11 @@ public class db_connection {
     public Connection connexionDatabase() {
 
         try {
-            Class.forName("org.mariadb.jdbc.Driver");
+//<<<<<<< HEAD
+//            Class.forName("org.mariadb.jdbc.Driver");
+//=======
+            Class.forName("com.mysql.cj.jdbc.Driver");
+
 
             connection = DriverManager.getConnection(url, username, password);
         } catch (Exception e) {
@@ -50,17 +54,34 @@ public class db_connection {
     }
 
     public ResultSet exécutionQuery(String sql) {
-        connexionDatabase();
-        ResultSet resultSet = null;
-        try {
-            statement = connection.createStatement();
-            resultSet = statement.executeQuery(sql);
-            System.out.println(sql);
-        } catch (SQLException ex) {
-            System.err.println(ex);//
-        }
-        return resultSet;
+
+//        connexionDatabase();
+//        ResultSet resultSet = null;
+//        try {
+//            statement = connection.createStatement();
+//            resultSet = statement.executeQuery(sql);
+//            System.out.println(sql);
+//        } catch (SQLException ex) {
+//            System.err.println(ex);//
+//        }
+//        return resultSet;
+//    }
+
+    connexionDatabase();
+    ResultSet resultSet = null;
+    try {
+        statement = connection.createStatement(
+            ResultSet.TYPE_SCROLL_INSENSITIVE,
+            ResultSet.CONCUR_READ_ONLY
+        );
+        resultSet = statement.executeQuery(sql);
+        System.out.println(sql);
+    } catch (SQLException ex) {
+        System.err.println(ex);
     }
+    return resultSet;
+}
+
 
     public String exécutionUpdate(String sql) {
         connexionDatabase();
@@ -250,6 +271,23 @@ public class db_connection {
 
     }
     
+
+    public int getRowCount(ResultSet rs) {
+    int rowCount = 0;
+    try {
+        if (rs != null) {
+            rs.last(); // aller à la dernière ligne
+            rowCount = rs.getRow(); // obtenir l'indice de la dernière ligne
+            rs.beforeFirst(); // revenir avant la première ligne
+        }
+    } catch (SQLException ex) {
+        System.err.println("Erreur lors du comptage des lignes : " + ex.getMessage());
+    }
+    return rowCount;
+}
+
+    
+
     
 
 
