@@ -19,7 +19,7 @@ public class SignUp extends javax.swing.JFrame {
     
     public SignUp() {
 
-//          setContentPane(backgroundPanel);1
+   //          setContentPane(backgroundPanel);1
                   initComponents();
                   setLocationRelativeTo(null);  
     }

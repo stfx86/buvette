@@ -4,8 +4,6 @@
  */
 package Vue;
 import DB.DB;
-import java.awt.Dimension;
-import javax.swing.JButton;
 /**
  
  * @author stof
