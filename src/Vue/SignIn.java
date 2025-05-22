@@ -12,13 +12,17 @@ public class SignIn extends javax.swing.JFrame {
     //variable to stocker the informations of the user 
     public static User user = new User() ;
     
+   
+    
+         
+    
 
     /**
      * Creates new form Login
      */
     
     public SignIn() {
-
+          
 //          setContentPane(backgroundPanel);1
                   initComponents();
                   setLocationRelativeTo(null);  
@@ -333,6 +337,8 @@ public class SignIn extends javax.swing.JFrame {
         jLabel1.setText("welcome user  (ᗒ‿ᗕ) ");
         user.setName(username);
         user.setPassword(password);
+        String email = DB.userEmail(username) ;
+        user.setEmail(email);
  
     
 javax.swing.Timer timer = new javax.swing.Timer(1500, e -> {

@@ -4,10 +4,19 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.geom.RoundRectangle2D;
-import DB.* ;
+import DB.*;
 
+/**
+ * Profile class represents a user profile panel with editable information
+ * including name, email, and password. It provides a modern UI with rounded
+ * corners and smooth animations.
+ */
 public class Profile extends JPanel {
+    
+    // User data
+    private User user;
+    
+    // UI Components
     private JLabel nameLabel;
     private JLabel emailLabel;
     private JButton changeNameBtn;
@@ -16,7 +25,10 @@ public class Profile extends JPanel {
     private JButton saveChangesBtn;
     private BackgroundPanel backgroundPanel;
     private JPanel contentPanel;
-
+   
+    /**
+     * Constructor initializes the profile panel with all UI components
+     */
     public Profile() {
         setLayout(new BorderLayout());
         setOpaque(false);
@@ -40,6 +52,7 @@ public class Profile extends JPanel {
         contentPanel.setBorder(new EmptyBorder(30, 30, 30, 30));
         contentPanel.setLayout(new GridBagLayout());
         
+        // Initialize and setup components
         initComponents();
         setupLayout();
         setupListeners();
@@ -51,30 +64,36 @@ public class Profile extends JPanel {
         add(backgroundPanel, BorderLayout.CENTER);
     }
 
+    /**
+     * Initializes all UI components with appropriate styles
+     */
     private void initComponents() {
         // Initialize labels with modern font and color
         Font labelFont = new Font("Segoe UI", Font.BOLD, 16);
         Color labelColor = new Color(220, 220, 220);
         
+        // Name label showing current user's name
         nameLabel = new JLabel("Name: " + SignIn.user.getName());
         nameLabel.setFont(labelFont);
         nameLabel.setForeground(labelColor);
         
+        // Email label showing current user's email (or "Not set" if null)
         emailLabel = new JLabel("Email: " + (SignIn.user.getEmail() != null ? SignIn.user.getEmail() : "Not set"));
         emailLabel.setFont(labelFont);
         emailLabel.setForeground(labelColor);
         
-        // Initialize buttons with modern style
+        // Button styling
         Font buttonFont = new Font("Segoe UI", Font.PLAIN, 14);
         Color buttonBg = new Color(70, 130, 180); // Steel blue
         Color buttonFg = Color.WHITE;
         
+        // Create styled buttons
         changeNameBtn = createModernButton("Edit Name", buttonFont, buttonBg, buttonFg);
         changePasswordBtn = createModernButton("Change Password", buttonFont, buttonBg, buttonFg);
         changeEmailBtn = createModernButton("Edit Email", buttonFont, buttonBg, buttonFg);
         saveChangesBtn = createModernButton("Save Profile", buttonFont, new Color(50, 150, 100), Color.WHITE); // Green for save
         
-        // Add icons to buttons (requires appropriate icons in your project)
+        // Add icons to buttons if available
         try {
             changeNameBtn.setIcon(new ImageIcon(getClass().getResource("/icons/edit.png")));
             changePasswordBtn.setIcon(new ImageIcon(getClass().getResource("/icons/lock.png")));
@@ -85,6 +104,15 @@ public class Profile extends JPanel {
         }
     }
     
+    /**
+     * Creates a modern styled button with rounded corners and hover effects
+     * 
+     * @param text Button text
+     * @param font Button font
+     * @param bg Background color
+     * @param fg Foreground (text) color
+     * @return Styled JButton
+     */
     private JButton createModernButton(String text, Font font, Color bg, Color fg) {
         JButton button = new JButton(text) {
             @Override
@@ -92,6 +120,7 @@ public class Profile extends JPanel {
                 Graphics2D g2 = (Graphics2D) g.create();
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                 
+                // Different colors for pressed and hover states
                 if (getModel().isPressed()) {
                     g2.setColor(bg.darker());
                 } else if (getModel().isRollover()) {
@@ -100,6 +129,7 @@ public class Profile extends JPanel {
                     g2.setColor(bg);
                 }
                 
+                // Draw rounded rectangle background
                 g2.fillRoundRect(0, 0, getWidth(), getHeight(), 15, 15);
                 g2.dispose();
                 
@@ -112,6 +142,7 @@ public class Profile extends JPanel {
             }
         };
         
+        // Set button properties
         button.setFont(font);
         button.setForeground(fg);
         button.setContentAreaFilled(false);
@@ -122,13 +153,16 @@ public class Profile extends JPanel {
         return button;
     }
 
+    /**
+     * Sets up the layout of all components using GridBagLayout
+     */
     private void setupLayout() {
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(15, 15, 15, 15);
-        gbc.anchor = GridBagConstraints.WEST;
+        gbc.anchor = GridBagConstraints.WEST; 
         gbc.fill = GridBagConstraints.HORIZONTAL;
         
-        // Header
+        // Header section
         JLabel header = new JLabel("Profile Settings");
         header.setFont(new Font("Segoe UI", Font.BOLD, 24));
         header.setForeground(Color.WHITE);
@@ -137,7 +171,7 @@ public class Profile extends JPanel {
         gbc.gridwidth = 2;
         contentPanel.add(header, gbc);
         
-        // Separator
+        // Separator line
         JSeparator separator = new JSeparator();
         separator.setForeground(new Color(70, 130, 180));
         gbc.gridy = 1;
@@ -145,7 +179,7 @@ public class Profile extends JPanel {
         contentPanel.add(separator, gbc);
         gbc.insets = new Insets(15, 15, 15, 15);
         
-        // User info section
+        // User info section - Name
         gbc.gridwidth = 1;
         gbc.gridy = 2;
         gbc.gridx = 0;
@@ -154,6 +188,7 @@ public class Profile extends JPanel {
         gbc.gridx = 1;
         contentPanel.add(changeNameBtn, gbc);
         
+        // User info section - Email
         gbc.gridy = 3;
         gbc.gridx = 0;
         contentPanel.add(emailLabel, gbc);
@@ -161,7 +196,7 @@ public class Profile extends JPanel {
         gbc.gridx = 1;
         contentPanel.add(changeEmailBtn, gbc);
         
-        // Password section
+        // Security section header
         gbc.gridy = 4;
         gbc.gridx = 0;
         gbc.gridwidth = 2;
@@ -170,22 +205,23 @@ public class Profile extends JPanel {
         securityHeader.setForeground(new Color(200, 200, 200));
         contentPanel.add(securityHeader, gbc);
         
+        // Security section - Password button
         gbc.gridy = 5;
         gbc.gridx = 0;
         gbc.gridwidth = 2;
         contentPanel.add(changePasswordBtn, gbc);
         
-        // Save button
+        // Save button at bottom
         gbc.gridy = 6;
         gbc.insets = new Insets(30, 15, 0, 15);
         gbc.fill = GridBagConstraints.NONE;
         gbc.anchor = GridBagConstraints.CENTER;
         contentPanel.add(saveChangesBtn, gbc);
     }
-    
-    
-    
 
+    /**
+     * Sets up action listeners for all buttons
+     */
     private void setupListeners() {
         changeNameBtn.addActionListener(this::changeNameAction);
         changePasswordBtn.addActionListener(this::changePasswordAction);
@@ -193,29 +229,39 @@ public class Profile extends JPanel {
         saveChangesBtn.addActionListener(this::saveChangesAction);
     }
 
+    /**
+     * Handles name change action
+     * @param e Action event
+     */
     private void changeNameAction(ActionEvent e) {
         String newName = showModernInputDialog("Edit Name", "Enter your new name:", SignIn.user.getName());
         if (newName != null && !newName.trim().isEmpty()) {
             SignIn.user.setName(newName);
             nameLabel.setText("Name: " + newName);
-            
-            
         }
     }
 
+    /**
+     * Handles password change action with validation
+     * @param e Action event
+     */
     private void changePasswordAction(ActionEvent e) {
+        // Create password change dialog
         JPanel panel = new JPanel(new GridLayout(0, 1, 10, 10));
         panel.setBorder(new EmptyBorder(15, 15, 15, 15));
         panel.setOpaque(false);
         
+        // Password fields
         JPasswordField currentPass = new JPasswordField();
         JPasswordField newPass = new JPasswordField();
         JPasswordField confirmPass = new JPasswordField();
         
+        // Add fields to panel
         panel.add(createInputField("Current Password:", currentPass));
         panel.add(createInputField("New Password:", newPass));
         panel.add(createInputField("Confirm New Password:", confirmPass));
         
+        // Show dialog
         int result = JOptionPane.showOptionDialog(
             this, 
             panel, 
@@ -227,57 +273,89 @@ public class Profile extends JPanel {
             "Change Password");
         
         if (result == JOptionPane.OK_OPTION) {
-            // Validation logic remains the same
+            // Get password values
             String currentPassStr = new String(currentPass.getPassword());
             String newPassStr = new String(newPass.getPassword());
             String confirmPassStr = new String(confirmPass.getPassword());
 
+            // Validate current password
             if (!currentPassStr.equals(SignIn.user.getPassword())) {
                 showErrorDialog("Current password is incorrect!");
                 return;
             }
 
+            // Validate new password match
             if (!newPassStr.equals(confirmPassStr)) {
                 showErrorDialog("New passwords do not match!");
                 return;
             }
 
+            // Validate password not empty
             if (newPassStr.trim().isEmpty()) {
                 showErrorDialog("New password cannot be empty!");
                 return;
             }
 
+            // Update password
             SignIn.user.setPassword(newPassStr);
             showSuccessDialog("Password changed successfully!");
-            DB.changePassword(SignIn.user.getName() , newPassStr) ;
+            
+            // Update in database
+            DB.changePassword(SignIn.user.getName(), newPassStr);
         }
     }
 
+    /**
+     * Handles email change action
+     * @param e Action event
+     */
     private void changeEmailAction(ActionEvent e) {
         String currentEmail = SignIn.user.getEmail() != null ? SignIn.user.getEmail() : "";
         String newEmail = showModernInputDialog("Edit Email", "Enter your new email:", currentEmail);
         if (newEmail != null && !newEmail.trim().isEmpty()) {
             SignIn.user.setEmail(newEmail);
+            System.out.println(SignIn.user.getEmail());
+            DB.updateEmail(SignIn.user.getName(), SignIn.user.getEmail());
+            System.out.println("email modifie ");
             emailLabel.setText("Email: " + newEmail);
         }
     }
 
+    /**
+     * Handles save changes action
+     * @param e Action event
+     */
     private void saveChangesAction(ActionEvent e) {
-        // Here you would typically save to database
-     DB.changeName(TOOL_TIP_TEXT_KEY, TOOL_TIP_TEXT_KEY) ;
+        // Save all changes to database
+        DB.updateUserInformation(
+            SignIn.user.getName(), 
+            SignIn.user.getName(),
+            SignIn.user.getPassword(), 
+            SignIn.user.getEmail()
+        );
+        
         showSuccessDialog("Profile changes saved successfully!");
     }
     
-    // Helper methods for modern dialogs
+    /**
+     * Creates a modern styled input dialog
+     * 
+     * @param title Dialog title
+     * @param message Dialog message
+     * @param initialValue Initial value in input field
+     * @return User input or null if canceled
+     */
     private String showModernInputDialog(String title, String message, String initialValue) {
         JPanel panel = new JPanel(new BorderLayout(10, 10));
         panel.setBorder(new EmptyBorder(10, 10, 10, 10));
         panel.setOpaque(false);
         
+        // Create label
         JLabel label = new JLabel(message);
         label.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         label.setForeground(Color.WHITE);
         
+        // Create styled text field
         JTextField textField = new JTextField(initialValue);
         textField.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         textField.setBorder(BorderFactory.createCompoundBorder(
@@ -288,6 +366,7 @@ public class Profile extends JPanel {
         panel.add(label, BorderLayout.NORTH);
         panel.add(textField, BorderLayout.CENTER);
         
+        // Show dialog
         int result = JOptionPane.showOptionDialog(
             this, 
             panel, 
@@ -304,14 +383,23 @@ public class Profile extends JPanel {
         return null;
     }
     
+    /**
+     * Creates an input field with label
+     * 
+     * @param labelText Label text
+     * @param field Input field component
+     * @return Panel containing label and field
+     */
     private JPanel createInputField(String labelText, JComponent field) {
         JPanel panel = new JPanel(new BorderLayout(5, 5));
         panel.setOpaque(false);
         
+        // Create label
         JLabel label = new JLabel(labelText);
         label.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         label.setForeground(Color.WHITE);
         
+        // Style the input field
         field.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         if (field instanceof JTextField) {
             ((JTextField)field).setBorder(BorderFactory.createCompoundBorder(
@@ -326,6 +414,10 @@ public class Profile extends JPanel {
         return panel;
     }
     
+    /**
+     * Shows an error dialog
+     * @param message Error message to display
+     */
     private void showErrorDialog(String message) {
         JOptionPane.showMessageDialog(
             this, 
@@ -334,6 +426,10 @@ public class Profile extends JPanel {
             JOptionPane.ERROR_MESSAGE);
     }
     
+    /**
+     * Shows a success dialog
+     * @param message Success message to display
+     */
     private void showSuccessDialog(String message) {
         JOptionPane.showMessageDialog(
             this, 
@@ -342,6 +438,11 @@ public class Profile extends JPanel {
             JOptionPane.INFORMATION_MESSAGE);
     }
 
+    /**
+     * Sets user data to display in the profile
+     * @param name User name
+     * @param email User email
+     */
     public void setUserData(String name, String email) {
         nameLabel.setText("Name: " + name);
         emailLabel.setText("Email: " + email);

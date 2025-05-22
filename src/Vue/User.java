@@ -11,7 +11,7 @@ package Vue;
 public class User {
     private String name ; 
     private String password ;
-    private String email  = "najiy514@gmail.com";
+    private String email  = "emial@gmail.com";
     
     
     public String getName(){
@@ -33,5 +33,15 @@ public class User {
     public void setEmail(String password){
         this.email= password ;
     }
+    
+    
+    
+    
+
+    
+    
+    
+    
+    
     
 }

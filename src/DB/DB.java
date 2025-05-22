@@ -64,6 +64,28 @@ public class DB {
             return false;
         }
     }
+    
+    
+    
+    public static String userEmail(String name) {
+        String sql = "SELECT email FROM buvette.users WHERE name = ? ";
+        try (Connection conn = connect(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, name);
+          
+            try (ResultSet rs = stmt.executeQuery()) {
+                 rs.next();
+                 return rs.getString("email") ;
+            }
+        } catch (SQLException e) {
+            System.out.println("Error de selcting email ");
+            e.printStackTrace();
+            return null ;
+        }
+    }
+    
+    
+    
+    
 
     public static boolean chekPassword(String name, String password) {
         String sql = "SELECT password from users WHERE name = ?";
@@ -477,6 +499,62 @@ public static Map<String, String> getUsersEmailsWithNames() {
             return false;
         }
     }
+    
+  
+    
+    public static boolean updateUserInformation(String oldNom, String newNom, String password, String email) {
+    String sql = "UPDATE buvette.users SET name = ?, password = ?, email = ? WHERE name = ?";
+    try (Connection conn = connect(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+        stmt.setString(1, newNom);
+        stmt.setString(2, password);
+        stmt.setString(3, email);
+        stmt.setString(4, oldNom); // filtre WHERE name = oldNom
+
+        stmt.executeUpdate();
+        return true;
+    } catch (SQLException e) {
+        System.out.println("Error updating user information:");
+        e.printStackTrace();
+        return false;
+    }
+}
+   
+    
+    static public boolean  updateEmail(String name  , String email ){
+    
+    String sql = "UPDATE buvette.users SET  email = ? WHERE name = ?";
+    try (Connection conn = connect(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+        stmt.setString(1, name);
+        stmt.setString(2, email );
+        
+        stmt.executeUpdate();
+        return true;
+    } catch (SQLException e) {
+        System.out.println("Error updating user information:");
+        e.printStackTrace();
+        return false;
+    }
+        
+        
+        
+        
+        
+        
+    
+        
+        
+        
+        
+        
+    }
+    
+    
+    
+    
+    
+    
+    
+    
 
     public static boolean deletePlat(String nomp) {
         String sql = "DELETE FROM buvette.plat WHERE nom = ?";
