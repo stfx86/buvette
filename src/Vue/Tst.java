@@ -44,14 +44,14 @@ public class Tst extends javax.swing.JFrame {
         
         // Set the size of the frame
         this.setSize(500, 400); // You can change the size to suit your 
-<<<<<<< HEAD
+
    FloatingChatIcon chatIcon = new FloatingChatIcon(this);
-=======
+
         //
       
         //
 MainPrincipal.main(new String[0]);
->>>>>>> 8ce5a98baf08cf511050a5464efe87c6b047d614
+
         
     }
 

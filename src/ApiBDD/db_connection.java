@@ -30,11 +30,8 @@ public class db_connection {
     public Connection connexionDatabase() {
 
         try {
-<<<<<<< HEAD
+
             Class.forName("com.mysql.cj.jdbc.Driver");
-=======
-            Class.forName("org.mariadb.jdbc.Driver");
->>>>>>> 8ce5a98baf08cf511050a5464efe87c6b047d614
 
             connection = DriverManager.getConnection(url, username, password);
         } catch (Exception e) {
@@ -54,7 +51,7 @@ public class db_connection {
     }
 
     public ResultSet exécutionQuery(String sql) {
-<<<<<<< HEAD
+
     connexionDatabase();
     ResultSet resultSet = null;
     try {
@@ -69,19 +66,7 @@ public class db_connection {
     }
     return resultSet;
 }
-=======
-        connexionDatabase();
-        ResultSet resultSet = null;
-        try {
-            statement = connection.createStatement();
-            resultSet = statement.executeQuery(sql);
-            System.out.println(sql);
-        } catch (SQLException ex) {
-            System.err.println(ex);//
-        }
-        return resultSet;
-    }
->>>>>>> 8ce5a98baf08cf511050a5464efe87c6b047d614
+
 
     public String exécutionUpdate(String sql) {
         connexionDatabase();
@@ -271,7 +256,7 @@ public class db_connection {
 
     }
     
-<<<<<<< HEAD
+
     public int getRowCount(ResultSet rs) {
     int rowCount = 0;
     try {
@@ -287,8 +272,7 @@ public class db_connection {
 }
 
     
-=======
->>>>>>> 8ce5a98baf08cf511050a5464efe87c6b047d614
+
     
 
 
