@@ -3,22 +3,20 @@ package Ai;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.awt.geom.Ellipse2D;
+import java.awt.geom.RoundRectangle2D;
 import java.net.http.*;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 
-/**
- * A floating chat icon that can be dragged around the screen and opens a chat panel when clicked.
- * Integrated with Google Gemini API for chat responses, no Gson dependency.
- */
 public class FloatingChatIcon extends JPanel {
     private static final int ICON_SIZE = 60;
-    private static final Color ICON_COLOR = new Color(25, 118, 210); // Material blue
-    private static final Color ICON_HOVER_COLOR = new Color(30, 136, 229);
+    private static final Color ICON_COLOR = new Color(33, 150, 243); // Modern blue
+    private static final Color ICON_HOVER_COLOR = new Color(66, 165, 245); // Lighter blue on hover
     private static final Color ICON_SYMBOL_COLOR = Color.WHITE;
     private static final int BADGE_SIZE = 20;
-    private static final Color BADGE_COLOR = new Color(244, 67, 54); // Material red
+    private static final Color BADGE_COLOR = new Color(244, 67, 54);
+    private static final Color SHADOW_COLOR = new Color(0, 0, 0, 80); // Subtle shadow
+    private Image backgroundImage;
 
     private Point dragStart = null;
     private boolean isHovered = false;
@@ -47,6 +45,9 @@ public class FloatingChatIcon extends JPanel {
 
         addMouseListener();
         addMotionListener();
+
+        // Load a modern icon (replace with your own high-quality icon path)
+        backgroundImage = new ImageIcon("src/images/chat.png").getImage();
 
         window.setVisible(true);
     }
@@ -124,35 +125,38 @@ public class FloatingChatIcon extends JPanel {
 
     @Override
     protected void paintComponent(Graphics g) {
-        super.paintComponent(g);
         Graphics2D g2d = (Graphics2D) g.create();
-
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-        g2d.setColor(isHovered ? ICON_HOVER_COLOR : ICON_COLOR);
-        Ellipse2D.Double circle = new Ellipse2D.Double(0, 0, ICON_SIZE, ICON_SIZE);
-        g2d.fill(circle);
+        // Draw shadow
+        g2d.setColor(SHADOW_COLOR);
+        g2d.fillOval(4, 4, ICON_SIZE - 8, ICON_SIZE - 8);
 
-        g2d.setColor(ICON_SYMBOL_COLOR);
-        int margin = ICON_SIZE / 5;
-        int centerX = ICON_SIZE / 2;
-        int centerY = ICON_SIZE / 2;
+        // Draw gradient background for icon
+        GradientPaint gradient = new GradientPaint(
+            0, 0, isHovered ? ICON_HOVER_COLOR : ICON_COLOR,
+            0, ICON_SIZE, isHovered ? ICON_COLOR : ICON_HOVER_COLOR
+        );
+        g2d.setPaint(gradient);
+        g2d.fillOval(0, 0, ICON_SIZE, ICON_SIZE);
 
-        int[] xPoints = {margin, ICON_SIZE - margin, ICON_SIZE - margin, centerX + 5, centerX - 5, margin};
-        int[] yPoints = {margin, margin, centerY + 5, centerY + 5, ICON_SIZE - margin, ICON_SIZE - margin};
-        g2d.fillPolygon(xPoints, yPoints, xPoints.length);
+        // Draw the icon image
+        if (backgroundImage != null) {
+            g2d.setComposite(AlphaComposite.SrcOver);
+            g2d.drawImage(backgroundImage, 5, 5, ICON_SIZE - 10, ICON_SIZE - 10, this);
+        }
 
+        // Draw unread message badge
         if (unreadMessages > 0) {
             g2d.setColor(BADGE_COLOR);
             g2d.fillOval(ICON_SIZE - BADGE_SIZE, 0, BADGE_SIZE, BADGE_SIZE);
-
-            g2d.setColor(Color.WHITE);
-            g2d.setFont(new Font("Arial", Font.BOLD, 10));
-            FontMetrics fm = g2d.getFontMetrics();
+            g2d.setColor(ICON_SYMBOL_COLOR);
+            g2d.setFont(new Font("SansSerif", Font.BOLD, 14)); // Slightly larger badge font
             String badgeText = unreadMessages > 9 ? "9+" : String.valueOf(unreadMessages);
-            int textX = ICON_SIZE - BADGE_SIZE / 2 - fm.stringWidth(badgeText) / 2;
-            int textY = BADGE_SIZE / 2 + fm.getAscent() / 2 - 1;
-            g2d.drawString(badgeText, textX, textY);
+            FontMetrics fm = g2d.getFontMetrics();
+            int textWidth = fm.stringWidth(badgeText);
+            int textHeight = fm.getAscent();
+            g2d.drawString(badgeText, ICON_SIZE - BADGE_SIZE + (BADGE_SIZE - textWidth) / 2, BADGE_SIZE - (BADGE_SIZE - textHeight) / 2);
         }
 
         g2d.dispose();
@@ -180,19 +184,126 @@ public class FloatingChatIcon extends JPanel {
 
         public ChatPanel(JFrame parentFrame) {
             dialog = new JDialog(parentFrame, "Chat", false);
-            dialog.setSize(300, 400);
+            dialog.setSize(350, 450);
             dialog.setLayout(new BorderLayout());
+            // Rounded corners for dialog
+            dialog.setUndecorated(true); // Remove default window decorations
+            dialog.getRootPane().setBorder(BorderFactory.createLineBorder(new Color(20, 25, 35), 1));
+            dialog.setShape(new RoundRectangle2D.Double(0, 0, 350, 450, 20, 20)); // Rounded corners
 
-            chatHistory = new JTextArea();
+            // Modern chat history area with dark gradient background and inner shadow
+            chatHistory = new JTextArea() {
+                @Override
+                protected void paintComponent(Graphics g) {
+                    Graphics2D g2d = (Graphics2D) g.create();
+                    g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                    // Dark gradient background
+                    GradientPaint gradient = new GradientPaint(
+                        0, 0, new Color(10, 15, 30), // Deep black-blue
+                        0, getHeight(), new Color(40, 50, 70) // Dark gray-blue
+                    );
+                    g2d.setPaint(gradient);
+                    g2d.fillRect(0, 0, getWidth(), getHeight());
+                    // Inner shadow
+                    g2d.setColor(new Color(0, 0, 0, 80));
+                    g2d.drawRect(0, 0, getWidth() - 1, getHeight() - 1);
+                    g2d.dispose();
+                    super.paintComponent(g);
+                }
+            };
+            chatHistory.setOpaque(false); // Allow gradient to show
+            chatHistory.setForeground(new Color(200, 200, 200)); // Light gray text for contrast
+            chatHistory.setFont(new Font("Roboto", Font.PLAIN, 18));
             chatHistory.setEditable(false);
             chatHistory.setLineWrap(true);
             chatHistory.setWrapStyleWord(true);
-            JScrollPane scrollPane = new JScrollPane(chatHistory);
+            chatHistory.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
+
+            JScrollPane scrollPane = new JScrollPane(chatHistory) {
+                @Override
+                protected void paintComponent(Graphics g) {
+                    Graphics2D g2d = (Graphics2D) g.create();
+                    g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                    GradientPaint gradient = new GradientPaint(
+                        0, 0, new Color(10, 15, 30),
+                        0, getHeight(), new Color(40, 50, 70)
+                    );
+                    g2d.setPaint(gradient);
+                    g2d.fillRect(0, 0, getWidth(), getHeight());
+                    g2d.dispose();
+                    super.paintComponent(g);
+                }
+            };
+            scrollPane.setOpaque(false);
+            scrollPane.getViewport().setOpaque(false);
+            scrollPane.setBorder(null);
+            scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
             dialog.add(scrollPane, BorderLayout.CENTER);
 
-            JPanel inputPanel = new JPanel(new BorderLayout());
-            messageField = new JTextField();
+            // Modern input panel with matching dark gradient
+            JPanel inputPanel = new JPanel(new BorderLayout(5, 5)) {
+                @Override
+                protected void paintComponent(Graphics g) {
+                    Graphics2D g2d = (Graphics2D) g.create();
+                    g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                    GradientPaint gradient = new GradientPaint(
+                        0, 0, new Color(10, 15, 30),
+                        0, getHeight(), new Color(40, 50, 70)
+                    );
+                    g2d.setPaint(gradient);
+                    g2d.fillRoundRect(0, 0, getWidth(), getHeight(), 15, 15);
+                    g2d.dispose();
+                    super.paintComponent(g);
+                }
+            };
+            inputPanel.setOpaque(false);
+            inputPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
+            // Custom message input field with dark gradient and prominent border
+            messageField = new JTextField() {
+                @Override
+                protected void paintComponent(Graphics g) {
+                    Graphics2D g2d = (Graphics2D) g.create();
+                    g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                    // Semi-transparent dark gradient background
+                    GradientPaint gradient = new GradientPaint(
+                        0, 0, new Color(10, 15, 30, 180),
+                        0, getHeight(), new Color(40, 50, 70, 180)
+                    );
+                    g2d.setPaint(gradient);
+                    g2d.fillRoundRect(0, 0, getWidth(), getHeight(), 10, 10);
+                    // Inner shadow
+                    g2d.setColor(new Color(0, 0, 0, 80));
+                    g2d.drawRoundRect(0, 0, getWidth() - 1, getHeight() - 1, 10, 10);
+                    g2d.dispose();
+                    super.paintComponent(g);
+                }
+            };
+            messageField.setOpaque(false); // Allow gradient to show
+            messageField.setForeground(new Color(200, 200, 200)); // Light gray text for contrast
+            messageField.setFont(new Font("Roboto", Font.PLAIN, 16));
+            messageField.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(new Color(100, 200, 255), 2, true), // Thicker, bright cyan border
+                BorderFactory.createEmptyBorder(8, 8, 8, 8)
+            ));
+
             sendButton = new JButton("Send");
+            sendButton.setBackground(new Color(25, 100, 200)); // Darker blue
+            sendButton.setForeground(new Color(200, 200, 200)); // Light gray text
+            sendButton.setFont(new Font("Roboto", Font.BOLD, 16));
+            sendButton.setBorder(BorderFactory.createEmptyBorder(8, 15, 8, 15));
+            sendButton.setFocusPainted(false);
+            sendButton.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseEntered(MouseEvent e) {
+                    sendButton.setBackground(new Color(50, 120, 220));
+                }
+
+                @Override
+                public void mouseExited(MouseEvent e) {
+                    sendButton.setBackground(new Color(25, 100, 200));
+                }
+            });
 
             inputPanel.add(messageField, BorderLayout.CENTER);
             inputPanel.add(sendButton, BorderLayout.EAST);
@@ -202,14 +313,6 @@ public class FloatingChatIcon extends JPanel {
 
             sendButton.addActionListener(e -> sendMessage());
             messageField.addActionListener(e -> sendMessage());
-
-            dialog.addWindowListener(new WindowAdapter() {
-                @Override
-                public void windowClosing(WindowEvent e) {
-                    setVisible(false);
-                    chatPanelVisible = false;
-                }
-            });
         }
 
         private void positionDialog() {
@@ -251,7 +354,6 @@ public class FloatingChatIcon extends JPanel {
             String responseBody = response.body();
 
             if (response.statusCode() == 200) {
-                // Check for error in response
                 if (responseBody.contains("\"error\"")) {
                     int errorStart = responseBody.indexOf("\"message\":") + 10;
                     int errorEnd = responseBody.indexOf("\"", errorStart);
@@ -259,7 +361,6 @@ public class FloatingChatIcon extends JPanel {
                     throw new RuntimeException("Gemini API error: " + errorMessage);
                 }
 
-                // Extract text from candidates[0].content.parts[0].text
                 String marker = "\"text\": \"";
                 int textStart = responseBody.indexOf(marker) + marker.length();
                 int textEnd = responseBody.indexOf("\"", textStart);
@@ -279,7 +380,7 @@ public class FloatingChatIcon extends JPanel {
         }
 
         public void addMessage(String sender, String message) {
-            String formattedMessage = sender + ": " + message + "\n";
+            String formattedMessage = sender + ": " + message + "\n\n";
             chatHistory.append(formattedMessage);
             chatHistory.setCaretPosition(chatHistory.getDocument().getLength());
         }

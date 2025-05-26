@@ -50,7 +50,9 @@ public class Tst extends javax.swing.JFrame {
         //
       
         //
+
 MainPrincipal.main(new String[0]);
+
 
         
     }

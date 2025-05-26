@@ -163,7 +163,8 @@ public class Admin extends JPanel {
         });
         
 
-        //lets add an url imag based 
+        
+
 
         JButton chooseImageUrlButton = new JButton("url instead");
          styleButton(chooseImageUrlButton);
@@ -171,10 +172,6 @@ public class Admin extends JPanel {
          imgPanel.add(imgPathLabel);
          
 
-         
-         
-         
-         
 
 
        chooseImageUrlButton.addActionListener(e -> {

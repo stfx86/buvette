@@ -30,8 +30,16 @@ public class db_connection {
     public Connection connexionDatabase() {
 
         try {
+<<<<<<< HEAD
 
             Class.forName("com.mysql.cj.jdbc.Driver");
+=======
+//<<<<<<< HEAD
+//            Class.forName("org.mariadb.jdbc.Driver");
+//=======
+            Class.forName("com.mysql.cj.jdbc.Driver");
+
+>>>>>>> 03f4e00d986fc09f5fd10053a38115f8d0fd4b33
 
             connection = DriverManager.getConnection(url, username, password);
         } catch (Exception e) {
@@ -52,6 +60,21 @@ public class db_connection {
 
     public ResultSet exécutionQuery(String sql) {
 
+<<<<<<< HEAD
+=======
+//        connexionDatabase();
+//        ResultSet resultSet = null;
+//        try {
+//            statement = connection.createStatement();
+//            resultSet = statement.executeQuery(sql);
+//            System.out.println(sql);
+//        } catch (SQLException ex) {
+//            System.err.println(ex);//
+//        }
+//        return resultSet;
+//    }
+
+>>>>>>> 03f4e00d986fc09f5fd10053a38115f8d0fd4b33
     connexionDatabase();
     ResultSet resultSet = null;
     try {

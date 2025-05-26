@@ -3,7 +3,11 @@
 
 import Ai.FloatingChatIcon;
 
+
 import Application.MainPrincipal;
+
+//import Application.MainPrincipal;
+
 
 import DB.DB;
 import java.awt.BorderLayout;
@@ -135,7 +139,7 @@ public class BuvetteApp1 extends JFrame {
 
         // Admin button
         navbar.setAdminAction(e -> {
-            MainPrincipal.main(new String[0]);
+//            MainPrincipal.main(new String[0]);
 //            cardLayout.show(cardPanel, "Admin");
             
             navbar.setActiveButton(navbar.getAdminBtn());
