@@ -86,6 +86,73 @@ public class DB {
     
     
     
+    public static List<Plat> searchPlats(String query, String type) {
+        List<Plat> results = new ArrayList<>();
+        String sql;
+        query = query.toLowerCase();
+        try (Connection conn = connect(); // Assume getConnection() exists
+             PreparedStatement stmt = conn.prepareStatement(getSearchQuery(type))) {
+            switch (type) {
+                case "Nom":
+                    sql = "SELECT * FROM plats WHERE LOWER(nom) LIKE ?";
+                    stmt.setString(1, "%" + query + "%");
+                    break;
+                case "Catégorie":
+                    sql = "SELECT * FROM plats WHERE LOWER(categorie) LIKE ?";
+                    stmt.setString(1, "%" + query + "%");
+                    break;
+                case "Prix":
+                    try {
+                        double price = Double.parseDouble(query);
+                        sql = "SELECT * FROM plats WHERE prix <= ?";
+                        stmt.setDouble(1, price);
+                    } catch (NumberFormatException e) {
+                        return results; // Return empty list for invalid price
+                    }
+                    break;
+                default: // "Tous"
+                    sql = "SELECT * FROM plats WHERE LOWER(nom) LIKE ? OR LOWER(categorie) LIKE ? OR LOWER(description) LIKE ?";
+                    stmt.setString(1, "%" + query + "%");
+                    stmt.setString(2, "%" + query + "%");
+                    stmt.setString(3, "%" + query + "%");
+                    break;
+            }
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                results.add(new Plat(
+                        rs.getString("nom"),
+                        rs.getDouble("prix"),
+                        rs.getString("description"),
+                        rs.getString("categorie"),
+                        rs.getString("image_path")
+                ));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return results;
+    }
+
+    private static String getSearchQuery(String type) {
+        switch (type) {
+            case "Nom":
+                return "SELECT * FROM plats WHERE LOWER(nom) LIKE ?";
+            case "Catégorie":
+                return "SELECT * FROM plats WHERE LOWER(categorie) LIKE ?";
+            case "Prix":
+                return "SELECT * FROM plats WHERE prix <= ?";
+            default:
+                return "SELECT * FROM plats WHERE LOWER(nom) LIKE ? OR LOWER(categorie) LIKE ? OR LOWER(description) LIKE ?";
+        }
+    }
+    
+    
+    
+    
+    
+    
+    
+          
 
     public static boolean chekPassword(String name, String password) {
         String sql = "SELECT password from users WHERE name = ?";

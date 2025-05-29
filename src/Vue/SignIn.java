@@ -11,7 +11,7 @@ import DB.DB;
 public class SignIn extends javax.swing.JFrame {
     //variable to stocker the informations of the user 
     public static User user = new User() ;
-    
+
    
     
          
@@ -362,8 +362,6 @@ timer.start();
         
     }//GEN-LAST:event_jButton1ActionPerformed
 
-    
-    
     
     
     
