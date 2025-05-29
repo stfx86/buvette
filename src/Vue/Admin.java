@@ -144,6 +144,8 @@ public class Admin extends JPanel {
         // Name field
         JLabel nomLabel = new JLabel("Nom du plat:");
         nomLabel.setFont(new Font("Arial", Font.BOLD, 14));
+        nomLabel.setForeground(Color.WHITE);  // Add this line
+      
         gbc.gridx = 0; gbc.gridy = 0;
         formPanel.add(nomLabel, gbc);
 
@@ -155,6 +157,7 @@ public class Admin extends JPanel {
         // Price field
         JLabel prixLabel = new JLabel("Prix (DH):");
         prixLabel.setFont(new Font("Arial", Font.BOLD, 14));
+        prixLabel.setForeground(Color.WHITE);  // Add this line
         gbc.gridx = 0; gbc.gridy = 1;
         formPanel.add(prixLabel, gbc);
 
@@ -166,6 +169,9 @@ public class Admin extends JPanel {
         // Description field
         JLabel descLabel = new JLabel("Description:");
         descLabel.setFont(new Font("Arial", Font.BOLD, 14));
+        descLabel.setForeground(Color.WHITE);  // Add this line
+        
+        
         gbc.gridx = 0; gbc.gridy = 2;
         formPanel.add(descLabel, gbc);
 
@@ -177,6 +183,7 @@ public class Admin extends JPanel {
         // Category field
         JLabel catLabel = new JLabel("Catégorie:");
         catLabel.setFont(new Font("Arial", Font.BOLD, 14));
+         catLabel.setForeground(Color.WHITE);  // Add this line
         gbc.gridx = 0; gbc.gridy = 3;
         formPanel.add(catLabel, gbc);
 
@@ -188,6 +195,7 @@ public class Admin extends JPanel {
         // Image field
         JLabel imgLabel = new JLabel("Image:");
         imgLabel.setFont(new Font("Arial", Font.BOLD, 14));
+        imgLabel.setForeground(Color.WHITE);  // Add this line
         gbc.gridx = 0; gbc.gridy = 4;
         formPanel.add(imgLabel, gbc);
 
@@ -258,6 +266,7 @@ public class Admin extends JPanel {
         
         JTextField searchField = new JTextField(25);
         searchField.setFont(new Font("Arial", Font.PLAIN, 14));
+     
         
         String[] searchTypes = {"Tous", "Nom", "Catégorie", "Prix"};
         JComboBox<String> searchTypeCombo = new JComboBox<>(searchTypes);
@@ -287,6 +296,7 @@ public class Admin extends JPanel {
         
         adminMenuTable = new JTable(tableModel);
         adminMenuTable.setFont(new Font("Arial", Font.PLAIN, 14));
+        adminMenuTable.getTableHeader().setForeground(Color.WHITE);  // Add this line
         adminMenuTable.setRowHeight(30);
         adminMenuTable.getTableHeader().setFont(new Font("Arial", Font.BOLD, 14));
         adminMenuTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
