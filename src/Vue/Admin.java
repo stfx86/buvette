@@ -135,7 +135,7 @@ public class Admin extends JPanel {
                 javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION,
                 javax.swing.border.TitledBorder.DEFAULT_POSITION,
                 new Font("Arial", Font.BOLD, 16),
-                new Color(70, 130, 180)));
+                Color.WHITE));
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(8, 8, 8, 8);
@@ -144,58 +144,59 @@ public class Admin extends JPanel {
         // Name field
         JLabel nomLabel = new JLabel("Nom du plat:");
         nomLabel.setFont(new Font("Arial", Font.BOLD, 14));
-        nomLabel.setForeground(Color.WHITE);  // Add this line
-      
+        nomLabel.setForeground(Color.WHITE);
         gbc.gridx = 0; gbc.gridy = 0;
         formPanel.add(nomLabel, gbc);
 
         nomField = new JTextField(20);
         nomField.setFont(new Font("Arial", Font.PLAIN, 14));
+        nomField.setBackground(new Color(240, 240, 240));
         gbc.gridx = 1; gbc.gridy = 0;
         formPanel.add(nomField, gbc);
 
         // Price field
         JLabel prixLabel = new JLabel("Prix (DH):");
         prixLabel.setFont(new Font("Arial", Font.BOLD, 14));
-        prixLabel.setForeground(Color.WHITE);  // Add this line
+        prixLabel.setForeground(Color.WHITE);
         gbc.gridx = 0; gbc.gridy = 1;
         formPanel.add(prixLabel, gbc);
 
         prixField = new JTextField(20);
         prixField.setFont(new Font("Arial", Font.PLAIN, 14));
+        prixField.setBackground(new Color(240, 240, 240));
         gbc.gridx = 1; gbc.gridy = 1;
         formPanel.add(prixField, gbc);
 
         // Description field
         JLabel descLabel = new JLabel("Description:");
         descLabel.setFont(new Font("Arial", Font.BOLD, 14));
-        descLabel.setForeground(Color.WHITE);  // Add this line
-        
-        
+        descLabel.setForeground(Color.WHITE);
         gbc.gridx = 0; gbc.gridy = 2;
         formPanel.add(descLabel, gbc);
 
         descField = new JTextField(20);
         descField.setFont(new Font("Arial", Font.PLAIN, 14));
+        descField.setBackground(new Color(240, 240, 240));
         gbc.gridx = 1; gbc.gridy = 2;
         formPanel.add(descField, gbc);
 
         // Category field
         JLabel catLabel = new JLabel("Catégorie:");
         catLabel.setFont(new Font("Arial", Font.BOLD, 14));
-         catLabel.setForeground(Color.WHITE);  // Add this line
+        catLabel.setForeground(Color.WHITE);
         gbc.gridx = 0; gbc.gridy = 3;
         formPanel.add(catLabel, gbc);
 
         catField = new JTextField(20);
         catField.setFont(new Font("Arial", Font.PLAIN, 14));
+        catField.setBackground(new Color(240, 240, 240));
         gbc.gridx = 1; gbc.gridy = 3;
         formPanel.add(catField, gbc);
 
         // Image field
         JLabel imgLabel = new JLabel("Image:");
         imgLabel.setFont(new Font("Arial", Font.BOLD, 14));
-        imgLabel.setForeground(Color.WHITE);  // Add this line
+        imgLabel.setForeground(Color.WHITE);
         gbc.gridx = 0; gbc.gridy = 4;
         formPanel.add(imgLabel, gbc);
 
@@ -210,6 +211,7 @@ public class Admin extends JPanel {
         
         imgPathLabel = new JLabel("Aucune image sélectionnée");
         imgPathLabel.setFont(new Font("Arial", Font.PLAIN, 12));
+        imgPathLabel.setForeground(Color.WHITE);
         
         imgPanel.add(chooseImageButton);
         imgPanel.add(chooseImageUrlButton);
@@ -258,29 +260,32 @@ public class Admin extends JPanel {
                 javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION,
                 javax.swing.border.TitledBorder.DEFAULT_POSITION,
                 new Font("Arial", Font.BOLD, 16),
-                new Color(70, 130, 180)));
+                Color.WHITE));
 
         // Search panel
         JPanel searchPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 5));
         searchPanel.setOpaque(false);
+        searchPanel.setBackground(new Color(0, 0, 0, 150));
+        
+        JLabel searchLabel = new JLabel("Recherche:");
+        searchLabel.setForeground(Color.WHITE);
+        searchPanel.add(searchLabel);
         
         JTextField searchField = new JTextField(25);
         searchField.setFont(new Font("Arial", Font.PLAIN, 14));
-     
+        searchField.setBackground(new Color(240, 240, 240));
+        searchPanel.add(searchField);
         
         String[] searchTypes = {"Tous", "Nom", "Catégorie", "Prix"};
         JComboBox<String> searchTypeCombo = new JComboBox<>(searchTypes);
+        searchPanel.add(searchTypeCombo);
         
         JButton searchButton = new JButton("Rechercher");
         styleButton(searchButton, new Color(70, 130, 180));
+        searchPanel.add(searchButton);
         
         JButton clearButton = new JButton("Réinitialiser");
         styleButton(clearButton, new Color(169, 169, 169));
-        
-        searchPanel.add(new JLabel("Recherche:"));
-        searchPanel.add(searchField);
-        searchPanel.add(searchTypeCombo);
-        searchPanel.add(searchButton);
         searchPanel.add(clearButton);
         
         tablePanel.add(searchPanel, BorderLayout.NORTH);
@@ -296,14 +301,14 @@ public class Admin extends JPanel {
         
         adminMenuTable = new JTable(tableModel);
         adminMenuTable.setFont(new Font("Arial", Font.PLAIN, 14));
-        adminMenuTable.getTableHeader().setForeground(Color.WHITE);  // Add this line
         adminMenuTable.setRowHeight(30);
         adminMenuTable.getTableHeader().setFont(new Font("Arial", Font.BOLD, 14));
+        adminMenuTable.getTableHeader().setForeground(Color.WHITE);
         adminMenuTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         adminMenuTable.setIntercellSpacing(new Dimension(0, 5));
         adminMenuTable.setShowGrid(false);
         
-        // Custom renderer for better visual appearance
+        // Custom renderer
         adminMenuTable.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
             @Override
             public Component getTableCellRendererComponent(JTable table, Object value,
@@ -315,7 +320,7 @@ public class Admin extends JPanel {
                     c.setBackground(new Color(70, 130, 180));
                     c.setForeground(Color.WHITE);
                 } else {
-                    c.setBackground(row % 2 == 0 ? new Color(240, 248, 255) : Color.WHITE);
+                    c.setBackground(row % 2 == 0 ? new Color(240, 248, 255, 200) : new Color(255, 255, 255, 200));
                     c.setForeground(Color.BLACK);
                 }
                 
@@ -329,7 +334,7 @@ public class Admin extends JPanel {
 
         JScrollPane scrollPane = new JScrollPane(adminMenuTable);
         scrollPane.setBorder(BorderFactory.createEmptyBorder());
-        scrollPane.getViewport().setBackground(Color.WHITE);
+        scrollPane.getViewport().setBackground(new Color(240, 240, 240, 200));
         
         tablePanel.add(scrollPane, BorderLayout.CENTER);
 

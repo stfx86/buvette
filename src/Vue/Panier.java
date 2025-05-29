@@ -263,27 +263,70 @@ public class Panier extends JPanel {
         updateDetailsView();
     }
 
+    
+    
+    
+//    private void refreshList() {
+//        listPanel.removeAll();
+//
+//        if (plats.isEmpty()) {
+//            JLabel emptyLabel = new JLabel("Your cart is empty");
+//            emptyLabel.setFont(new Font("Segoe UI", Font.ITALIC, 14));
+//            emptyLabel.setForeground(TEXT_COLOR);
+//            emptyLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+//            emptyLabel.setBorder(new EmptyBorder(50, 0, 50, 0));
+//            listPanel.add(emptyLabel);
+//        } else {
+//            Set<Plat> uniquePlats = new HashSet<>(plats);
+//            for (Plat plat : uniquePlats) {
+//                int quantity = platQuantities.get(plat);
+//                listPanel.add(createCartItemPanel(plat, quantity));
+//            }
+//        }
+//
+//        listPanel.revalidate();
+//        listPanel.repaint();
+//    }
+//    
+    
+    
+    
+    
+    
     private void refreshList() {
-        listPanel.removeAll();
+    listPanel.removeAll();
 
-        if (plats.isEmpty()) {
-            JLabel emptyLabel = new JLabel("Your cart is empty");
-            emptyLabel.setFont(new Font("Segoe UI", Font.ITALIC, 14));
-            emptyLabel.setForeground(TEXT_COLOR);
-            emptyLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-            emptyLabel.setBorder(new EmptyBorder(50, 0, 50, 0));
-            listPanel.add(emptyLabel);
-        } else {
-            Set<Plat> uniquePlats = new HashSet<>(plats);
-            for (Plat plat : uniquePlats) {
-                int quantity = platQuantities.get(plat);
+    if (plats.isEmpty()) {
+        JLabel emptyLabel = new JLabel("Your cart is empty");
+        emptyLabel.setFont(new Font("Segoe UI", Font.ITALIC, 14));
+        emptyLabel.setForeground(TEXT_COLOR);
+        emptyLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        emptyLabel.setBorder(new EmptyBorder(50, 0, 50, 0));
+        listPanel.add(emptyLabel);
+    } else {
+        Set<Plat> uniquePlats = new HashSet<>(plats);
+        for (Plat plat : uniquePlats) {
+            Integer quantity = platQuantities.get(plat);
+            if (quantity != null) {
                 listPanel.add(createCartItemPanel(plat, quantity));
             }
         }
-
-        listPanel.revalidate();
-        listPanel.repaint();
     }
+
+    listPanel.revalidate();
+    listPanel.repaint();
+}
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
 
     private JPanel createCartItemPanel(Plat plat, int quantity) {
         JPanel itemPanel = new JPanel(new BorderLayout(10, 0));
