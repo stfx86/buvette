@@ -193,32 +193,28 @@ public class FloatingChatIcon extends JPanel {
             dialog.setLayout(new BorderLayout());
             // Rounded corners for dialog
             dialog.setUndecorated(true); // Remove default window decorations
-            dialog.getRootPane().setBorder(BorderFactory.createLineBorder(new Color(20, 25, 35), 1));
+            dialog.getRootPane().setBorder(BorderFactory.createLineBorder(new Color(200, 200, 200), 1));
             dialog.setShape(new RoundRectangle2D.Double(0, 0, 350, 450, 20, 20)); // Rounded corners
 
-            // Modern chat history area with dark gradient background and inner shadow
+            // Modern chat history area with light background
             chatHistory = new JTextArea() {
                 @Override
                 protected void paintComponent(Graphics g) {
                     Graphics2D g2d = (Graphics2D) g.create();
                     g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                    // Dark gradient background
-                    GradientPaint gradient = new GradientPaint(
-                        0, 0, new Color(10, 15, 30), // Deep black-blue
-                        0, getHeight(), new Color(40, 50, 70) // Dark gray-blue
-                    );
-                    g2d.setPaint(gradient);
+                    // Light background
+                    g2d.setColor(new Color(245, 245, 245)); // Very light gray
                     g2d.fillRect(0, 0, getWidth(), getHeight());
                     // Inner shadow
-                    g2d.setColor(new Color(0, 0, 0, 80));
+                    g2d.setColor(new Color(200, 200, 200));
                     g2d.drawRect(0, 0, getWidth() - 1, getHeight() - 1);
                     g2d.dispose();
                     super.paintComponent(g);
                 }
             };
-            chatHistory.setOpaque(false); // Allow gradient to show
-            chatHistory.setForeground(new Color(200, 200, 200)); // Light gray text for contrast
-            chatHistory.setFont(new Font("Roboto", Font.PLAIN, 18));
+            chatHistory.setOpaque(false); // Allow background to show
+            chatHistory.setForeground(new Color(50, 50, 50)); // Dark gray text for contrast
+            chatHistory.setFont(new Font("Roboto", Font.PLAIN, 14));
             chatHistory.setEditable(false);
             chatHistory.setLineWrap(true);
             chatHistory.setWrapStyleWord(true);
@@ -229,11 +225,7 @@ public class FloatingChatIcon extends JPanel {
                 protected void paintComponent(Graphics g) {
                     Graphics2D g2d = (Graphics2D) g.create();
                     g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                    GradientPaint gradient = new GradientPaint(
-                        0, 0, new Color(10, 15, 30),
-                        0, getHeight(), new Color(40, 50, 70)
-                    );
-                    g2d.setPaint(gradient);
+                    g2d.setColor(new Color(245, 245, 245));
                     g2d.fillRect(0, 0, getWidth(), getHeight());
                     g2d.dispose();
                     super.paintComponent(g);
@@ -245,17 +237,13 @@ public class FloatingChatIcon extends JPanel {
             scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
             dialog.add(scrollPane, BorderLayout.CENTER);
 
-            // Modern input panel with matching dark gradient
+            // Modern input panel with light background
             JPanel inputPanel = new JPanel(new BorderLayout(5, 5)) {
                 @Override
                 protected void paintComponent(Graphics g) {
                     Graphics2D g2d = (Graphics2D) g.create();
                     g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                    GradientPaint gradient = new GradientPaint(
-                        0, 0, new Color(10, 15, 30),
-                        0, getHeight(), new Color(40, 50, 70)
-                    );
-                    g2d.setPaint(gradient);
+                    g2d.setColor(new Color(245, 245, 245));
                     g2d.fillRoundRect(0, 0, getWidth(), getHeight(), 15, 15);
                     g2d.dispose();
                     super.paintComponent(g);
@@ -264,49 +252,45 @@ public class FloatingChatIcon extends JPanel {
             inputPanel.setOpaque(false);
             inputPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-            // Custom message input field with dark gradient and prominent border
+            // Custom message input field with light background
             messageField = new JTextField() {
                 @Override
                 protected void paintComponent(Graphics g) {
                     Graphics2D g2d = (Graphics2D) g.create();
                     g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                    // Semi-transparent dark gradient background
-                    GradientPaint gradient = new GradientPaint(
-                        0, 0, new Color(10, 15, 30, 180),
-                        0, getHeight(), new Color(40, 50, 70, 180)
-                    );
-                    g2d.setPaint(gradient);
+                    // White background
+                    g2d.setColor(Color.WHITE);
                     g2d.fillRoundRect(0, 0, getWidth(), getHeight(), 10, 10);
-                    // Inner shadow
-                    g2d.setColor(new Color(0, 0, 0, 80));
+                    // Border
+                    g2d.setColor(new Color(200, 200, 200));
                     g2d.drawRoundRect(0, 0, getWidth() - 1, getHeight() - 1, 10, 10);
                     g2d.dispose();
                     super.paintComponent(g);
                 }
             };
-            messageField.setOpaque(false); // Allow gradient to show
-            messageField.setForeground(new Color(200, 200, 200)); // Light gray text for contrast
-            messageField.setFont(new Font("Roboto", Font.PLAIN, 16));
+            messageField.setOpaque(false); // Allow background to show
+            messageField.setForeground(new Color(50, 50, 50)); // Dark gray text
+            messageField.setFont(new Font("Roboto", Font.PLAIN, 14));
             messageField.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(new Color(100, 200, 255), 2, true), // Thicker, bright cyan border
+                BorderFactory.createLineBorder(new Color(33, 150, 243), 1, true), // Blue border
                 BorderFactory.createEmptyBorder(8, 8, 8, 8)
             ));
 
             sendButton = new JButton("Send");
-            sendButton.setBackground(new Color(25, 100, 200)); // Darker blue
-            sendButton.setForeground(new Color(200, 200, 200)); // Light gray text
-            sendButton.setFont(new Font("Roboto", Font.BOLD, 16));
+            sendButton.setBackground(new Color(33, 150, 243)); // Blue
+            sendButton.setForeground(Color.WHITE); // White text
+            sendButton.setFont(new Font("Roboto", Font.BOLD, 14));
             sendButton.setBorder(BorderFactory.createEmptyBorder(8, 15, 8, 15));
             sendButton.setFocusPainted(false);
             sendButton.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseEntered(MouseEvent e) {
-                    sendButton.setBackground(new Color(50, 120, 220));
+                    sendButton.setBackground(new Color(66, 165, 245)); // Lighter blue
                 }
 
                 @Override
                 public void mouseExited(MouseEvent e) {
-                    sendButton.setBackground(new Color(25, 100, 200));
+                    sendButton.setBackground(new Color(33, 150, 243)); // Original blue
                 }
             });
 
@@ -326,75 +310,57 @@ public class FloatingChatIcon extends JPanel {
         }
 
         public static String getMessagePlats() {
-    List<Plat> plats = DB.listPlats();
-    StringBuilder message = new StringBuilder("Liste des plats :\n");
+            List<Plat> plats = DB.listPlats();
+            StringBuilder message = new StringBuilder("Liste des plats :\n");
 
-    for (Plat plat : plats) {
-        message.append("Nom : ").append(plat.getNom()).append("\n")
-               .append("Prix : ").append(plat.getPrix()).append(" DH\n")
-               .append("Description : ").append(plat.getDescription()).append("\n")
-               .append("Catégorie : ").append(plat.getCategorie()).append("\n")
-               .append("Image : ").append(plat.getImagePath()).append("\n")
-               .append("-----------------------------\n");
-    }
+            for (Plat plat : plats) {
+                message.append("Nom : ").append(plat.getNom()).append("\n")
+                       .append("Prix : ").append(plat.getPrix()).append(" DH\n")
+                       .append("Description : ").append(plat.getDescription()).append("\n")
+                       .append("Catégorie : ").append(plat.getCategorie()).append("\n")
+                       .append("Image : ").append(plat.getImagePath()).append("\n")
+                       .append("-----------------------------\n");
+            }
 
-    return message.toString();
-}
+            return message.toString();
+        }
 
-        
-        
-        
-        
-        
         private void sendMessage() {
-            // make the chat bot in the contexte author youssef
-            
-             
-String msg = 
-    "You are Buvette ChatBot, a virtual assistant designed to help users with restaurant-related inquiries.\n"
-  + "Your creator is Youssef.\n\n"
+            String msg = 
+                "You are Buvette ChatBot, a virtual assistant designed to help users with restaurant-related inquiries.\n"
+              + "Your creator is Youssef.\n\n"
 
-  + "Here is how you should answer certain questions:\n"
-  + "- If the user asks: \"How are you?\" → Reply: \"I am Buvette ChatBot, always ready to help!\"\n"
-  + "- If the user asks: \"Who made you?\" → Reply: \"I was created by Youssef.\"\n"
-  + "- If the user asks: \"Who is talking?\" → Reply with the user's info below.\n\n"
+              + "Here is how you should answer certain questions:\n"
+              + "- If the user asks: \"How are you?\" → Reply: \"I am Buvette ChatBot, always ready to help!\"\n"
+              + "- If the user asks: \"Who made you?\" → Reply: \"I was created by Youssef.\"\n"
+              + "- If the user asks: \"Who is talking?\" → Reply with the user's info below.\n\n"
 
-  + "Here is the current user's information:\n"
-  + "- Name: " + SignIn.user.getName() + "\n"
-  + "- Email: " + SignIn.user.getEmail() + "\n"
-  + "- Password: " + SignIn.user.getPassword() + "\n\n"
+              + "Here is the current user's information:\n"
+              + "- Name: " + SignIn.user.getName() + "\n"
+              + "- Email: " + SignIn.user.getEmail() + "\n"
+              + "- Password: " + SignIn.user.getPassword() + "\n\n"
 
-  + "Below is the full list of available dishes you can use to answer menu-related questions:\n"
-  + getMessagePlats() + "\n"
+              + "Below is the full list of available dishes you can use to answer menu-related questions:\n"
+              + getMessagePlats() + "\n"
 
-  + "Use this information as your context to understand and respond to user messages appropriately." +
+              + "Use this information as your context to understand and respond to user messages appropriately." +
 
-"use this old conversation as your memory  " + oldConvesation ;
-        
-        
-        
+              "use this old conversation as your memory  " + oldConvesation ;
 
-             
-           
-            
-            
-            
-            
-            String message =messageField.getText().trim();
-            oldConvesation = oldConvesation.concat("user  : " + message + ",") ;
+            String message = messageField.getText().trim();
+            oldConvesation = oldConvesation.concat("user  : " + message + ",");
                     
             if (!message.isEmpty()) {
-                
                 addMessage("You", message);
                 messageField.setText("");
 
                 SwingUtilities.invokeLater(() -> {
                     try {
-                       String ContextePluseMessage  = msg.concat(message) ;
-                        System.out.println(ContextePluseMessage);
-                        System.out.println("Ai^ppppppppppppppppppppppppppppp");
+                        String ContextePluseMessage = msg.concat(message);
+                     
                         String response = sendToGemini(ContextePluseMessage);
-                        oldConvesation =oldConvesation.concat("chat bot  : " + response+ " ,") ;
+                        response.replace("Gemini","Buvette") ;
+                        oldConvesation = oldConvesation.concat("chat bot  : " + response + " ,");
                         addMessage("Gemini", response);
                     } catch (Exception e) {
                         addMessage("System", "Error communicating with Gemini API: " + e.getMessage());
