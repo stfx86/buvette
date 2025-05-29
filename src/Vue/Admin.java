@@ -15,7 +15,7 @@ import java.util.List;
 import javax.imageio.ImageIO;
 
 /**
- * Standalone class for the admin panel, handling dish management with database integration.
+ * Comprehensive admin panel for dish management with database integration.
  */
 public class Admin extends JPanel {
     private final List<Plat> menu;
@@ -24,7 +24,9 @@ public class Admin extends JPanel {
     private final JPanel cardPanel;
     private final List<String> nameSuggestions;
     private final List<String> categorySuggestions;
-    private String selectedImagePath; // Store the selected image path
+    private String selectedImagePath;
+    private DefaultTableModel tableModel;
+    private JTable adminMenuTable;
 
     public Admin(List<Plat> menu, Map<String, List<Plat>> menuData, CardLayout cardLayout, JPanel cardPanel) {
         this.menu = menu;
@@ -33,7 +35,7 @@ public class Admin extends JPanel {
         this.cardPanel = cardPanel;
         this.nameSuggestions = new ArrayList<>();
         this.categorySuggestions = new ArrayList<>();
-        this.selectedImagePath = ""; // Initialize empty
+        this.selectedImagePath = "";
         initializeData();
         initializeUI();
     }
@@ -59,6 +61,25 @@ public class Admin extends JPanel {
         setLayout(new BorderLayout(10, 10));
         BackgroundPanel backgroundPanel = new BackgroundPanel("src/images/py.png");
         backgroundPanel.setLayout(new BorderLayout(10, 10));
+
+        // Create toolbar
+        JPanel toolbar = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 10));
+        toolbar.setOpaque(false);
+        
+        JButton backButton = new JButton("Retour");
+        styleButton(backButton, new Color(200, 200, 200));
+        backButton.addActionListener(e -> cardLayout.show(cardPanel, "Home"));
+        
+        JButton listUsersButton = new JButton("Lister Utilisateurs");
+        styleButton(listUsersButton, new Color(0, 204, 102));
+        listUsersButton.addActionListener(e -> showUserList());
+        
+        toolbar.add(backButton);
+        toolbar.add(listUsersButton);
+        backgroundPanel.add(toolbar, BorderLayout.NORTH);
+
+        // Add search panel
+        backgroundPanel.add(createAdminSearchPanel(), BorderLayout.CENTER);
 
         // Form panel for adding/editing dishes
         JPanel formPanel = new JPanel();
@@ -142,7 +163,12 @@ public class Admin extends JPanel {
         imgPathLabel.setForeground(Color.WHITE);
         imgPathLabel.setFont(new Font("Arial", Font.PLAIN, 14));
         imgPanel.add(chooseImageButton);
-//        imgPanel.add(imgPathLabel);
+
+        JButton chooseImageUrlButton = new JButton("URL");
+        styleButton(chooseImageUrlButton);
+        imgPanel.add(chooseImageUrlButton);
+        imgPanel.add(imgPathLabel);
+        
         gbc.gridx = 1;
         gbc.gridy = 4;
         formPanel.add(imgPanel, gbc);
@@ -157,54 +183,34 @@ public class Admin extends JPanel {
             if (returnVal == JFileChooser.APPROVE_OPTION) {
                 File selectedFile = fileChooser.getSelectedFile();
                 selectedImagePath = selectedFile.getAbsolutePath();
-                imgPathLabel.setText(selectedFile.getName()); // Show file name only
-                imgPathLabel.setToolTipText(selectedImagePath); // Full path in tooltip
+                imgPathLabel.setText(selectedFile.getName());
+                imgPathLabel.setToolTipText(selectedImagePath);
             }
         });
-        
 
-        
-
-
-        JButton chooseImageUrlButton = new JButton("url instead");
-         styleButton(chooseImageUrlButton);
-         imgPanel.add(chooseImageUrlButton);
-         imgPanel.add(imgPathLabel);
-         
-
-
-
-       chooseImageUrlButton.addActionListener(e -> {
-    String imageUrl = JOptionPane.showInputDialog(null, "Entrez l'URL de l'image :", "Choisir Image par URL", JOptionPane.PLAIN_MESSAGE);
-    
-    if (imageUrl != null && !imageUrl.trim().isEmpty()) {
-        try {
-            URL url = new URL(imageUrl);
-            BufferedImage image = ImageIO.read(url);
-            if (image != null) {
-                // Save to a temporary file
-                File tempFile = File.createTempFile("downloaded_image_", ".png");
-                ImageIO.write(image, "png", tempFile);
-                
-                selectedImagePath = tempFile.getAbsolutePath();
-                imgPathLabel.setText(tempFile.getName());
-                imgPathLabel.setToolTipText(selectedImagePath);
-            } else {
-                JOptionPane.showMessageDialog(null, "L'image n'a pas pu être chargée depuis l'URL fournie.", "Erreur", JOptionPane.ERROR_MESSAGE);
+        chooseImageUrlButton.addActionListener(e -> {
+            String imageUrl = JOptionPane.showInputDialog(null, "Entrez l'URL de l'image :", 
+                    "Choisir Image par URL", JOptionPane.PLAIN_MESSAGE);
+            
+            if (imageUrl != null && !imageUrl.trim().isEmpty()) {
+                try {
+                    URL url = new URL(imageUrl);
+                    BufferedImage image = ImageIO.read(url);
+                    if (image != null) {
+                        File tempFile = File.createTempFile("downloaded_image_", ".png");
+                        ImageIO.write(image, "png", tempFile);
+                        selectedImagePath = tempFile.getAbsolutePath();
+                        imgPathLabel.setText(tempFile.getName());
+                        imgPathLabel.setToolTipText(selectedImagePath);
+                    } else {
+                        showError("L'image n'a pas pu être chargée depuis l'URL fournie.");
+                    }
+                } catch (IOException ex) {
+                    showError("URL invalide ou problème lors du téléchargement de l'image.");
+                }
             }
-        } catch (IOException ex) {
-            JOptionPane.showMessageDialog(null, "URL invalide ou problème lors du téléchargement de l'image.", "Erreur", JOptionPane.ERROR_MESSAGE);
-        }
-    }
-});
+        });
 
-
-        
-        
-        
-        //
-        
-        
         // Buttons for form actions
         JPanel formButtonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         formButtonPanel.setOpaque(false);
@@ -222,30 +228,25 @@ public class Admin extends JPanel {
         gbc.gridwidth = 2;
         formPanel.add(formButtonPanel, gbc);
 
-        backgroundPanel.add(formPanel, BorderLayout.NORTH);
-
         // Table for displaying dishes
         String[] columns = {"Nom", "Prix (DH)", "Description", "Catégorie", "Image"};
-        DefaultTableModel tableModel = new DefaultTableModel(columns, 0) {
+        tableModel = new DefaultTableModel(columns, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
-                return false; // Make table non-editable
+                return false;
             }
         };
-        JTable adminMenuTable = new JTable(tableModel);
+        adminMenuTable = new JTable(tableModel);
         adminMenuTable.setFont(new Font("Arial", Font.PLAIN, 14));
         adminMenuTable.setRowHeight(25);
         adminMenuTable.getTableHeader().setFont(new Font("Arial", Font.BOLD, 14));
         adminMenuTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
         // Populate table
-        for (Plat plat : menu) {
-            tableModel.addRow(new Object[]{plat.getNom(), plat.getPrix(), plat.getDescription(), plat.getCategorie(), plat.getImagePath()});
-        }
+        refreshTable();
 
         JScrollPane tableScrollPane = new JScrollPane(adminMenuTable);
         tableScrollPane.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        backgroundPanel.add(tableScrollPane, BorderLayout.CENTER);
 
         // Bottom buttons
         JPanel adminButtons = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
@@ -259,15 +260,15 @@ public class Admin extends JPanel {
         styleButton(deleteButton, new Color(255, 80, 80));
         adminButtons.add(deleteButton);
 
-        JButton listUsersButton = new JButton("Lister Utilisateurs");
-        styleButton(listUsersButton, new Color(0, 204, 102));
-        adminButtons.add(listUsersButton);
+        // Layout organization
+        JPanel centerPanel = new JPanel(new BorderLayout());
+        centerPanel.setOpaque(false);
+        centerPanel.add(formPanel, BorderLayout.NORTH);
+        centerPanel.add(tableScrollPane, BorderLayout.CENTER);
+        centerPanel.add(adminButtons, BorderLayout.SOUTH);
 
-        JButton backButtonAdmin = new JButton("Retour");
-        styleButton(backButtonAdmin, new Color(200, 200, 200));
-        adminButtons.add(backButtonAdmin);
-
-        backgroundPanel.add(adminButtons, BorderLayout.SOUTH);
+        backgroundPanel.add(centerPanel, BorderLayout.CENTER);
+        add(backgroundPanel, BorderLayout.CENTER);
 
         // Action listeners
         addButton.addActionListener(e -> {
@@ -277,29 +278,31 @@ public class Admin extends JPanel {
                 String desc = descField.getText().trim();
                 String cat = catField.getText().trim();
                 String img = selectedImagePath.trim();
+                
                 if (!nom.isEmpty() && prix >= 0 && !cat.isEmpty() && !img.isEmpty()) {
                     Plat plat = new Plat(nom, prix, desc, cat, img);
                     if (DB.addPlat(plat)) {
                         menu.add(plat);
                         menuData.computeIfAbsent(cat, k -> new ArrayList<>()).add(plat);
-                        tableModel.addRow(new Object[]{plat.getNom(), plat.getPrix(), plat.getDescription(), plat.getCategorie(), plat.getImagePath()});
+                        refreshTable();
                         clearForm(new JTextField[]{nomField, prixField, descField, catField}, imgPathLabel);
-                        // Update suggestions (for consistency)
+                        
+                        // Update suggestions
                         if (!nameSuggestions.contains(nom)) {
                             nameSuggestions.add(nom);
                         }
                         if (!categorySuggestions.contains(cat)) {
                             categorySuggestions.add(cat);
                         }
-                        JOptionPane.showMessageDialog(this, "Plat ajouté avec succès !", "Succès", JOptionPane.INFORMATION_MESSAGE);
+                        showSuccess("Plat ajouté avec succès !");
                     } else {
-                        JOptionPane.showMessageDialog(this, "Erreur lors de l'ajout du plat dans la base de données !", "Erreur", JOptionPane.ERROR_MESSAGE);
+                        showError("Erreur lors de l'ajout du plat dans la base de données !");
                     }
                 } else {
-                    JOptionPane.showMessageDialog(this, "Veuillez entrer des données valides et sélectionner une image !", "Erreur", JOptionPane.ERROR_MESSAGE);
+                    showError("Veuillez entrer des données valides et sélectionner une image !");
                 }
             } catch (NumberFormatException ex) {
-                JOptionPane.showMessageDialog(this, "Prix invalide !", "Erreur", JOptionPane.ERROR_MESSAGE);
+                showError("Prix invalide !");
             }
         });
 
@@ -316,10 +319,12 @@ public class Admin extends JPanel {
                     String desc = descField.getText().trim();
                     String cat = catField.getText().trim();
                     String img = selectedImagePath.trim();
+                    
                     if (!nom.isEmpty() && prix >= 0 && !cat.isEmpty() && !img.isEmpty()) {
                         String oldCat = (String) tableModel.getValueAt(selectedRow, 3);
                         Plat selectedPlat = menu.get(selectedRow);
                         Plat newPlat = new Plat(nom, prix, desc, cat, img);
+                        
                         if (DB.updatePlat(selectedPlat, newPlat)) {
                             menuData.get(oldCat).remove(selectedPlat);
                             selectedPlat.setNom(nom);
@@ -328,38 +333,37 @@ public class Admin extends JPanel {
                             selectedPlat.setCategorie(cat);
                             selectedPlat.setImagePath(img);
                             menuData.computeIfAbsent(cat, k -> new ArrayList<>()).add(selectedPlat);
-                            tableModel.setValueAt(nom, selectedRow, 0);
-                            tableModel.setValueAt(prix, selectedRow, 1);
-                            tableModel.setValueAt(desc, selectedRow, 2);
-                            tableModel.setValueAt(cat, selectedRow, 3);
-                            tableModel.setValueAt(img, selectedRow, 4);
+                            refreshTable();
                             clearForm(new JTextField[]{nomField, prixField, descField, catField}, imgPathLabel);
-                            // Update suggestions (for consistency)
+                            
+                            // Update suggestions
                             if (!nameSuggestions.contains(nom)) {
                                 nameSuggestions.add(nom);
                             }
                             if (!categorySuggestions.contains(cat)) {
                                 categorySuggestions.add(cat);
                             }
-                            JOptionPane.showMessageDialog(this, "Plat modifié avec succès !", "Succès", JOptionPane.INFORMATION_MESSAGE);
+                            showSuccess("Plat modifié avec succès !");
                         } else {
-                            JOptionPane.showMessageDialog(this, "Erreur lors de la modification du plat dans la base de données !", "Erreur", JOptionPane.ERROR_MESSAGE);
+                            showError("Erreur lors de la modification du plat dans la base de données !");
                         }
                     } else {
-                        JOptionPane.showMessageDialog(this, "Veuillez entrer des données valides et sélectionner une image !", "Erreur", JOptionPane.ERROR_MESSAGE);
+                        showError("Veuillez entrer des données valides et sélectionner une image !");
                     }
                 } catch (NumberFormatException ex) {
-                    JOptionPane.showMessageDialog(this, "Prix invalide !", "Erreur", JOptionPane.ERROR_MESSAGE);
+                    showError("Prix invalide !");
                 }
             } else {
-                JOptionPane.showMessageDialog(this, "Sélectionnez un plat à modifier !", "Erreur", JOptionPane.ERROR_MESSAGE);
+                showError("Sélectionnez un plat à modifier !");
             }
         });
 
         deleteButton.addActionListener(e -> {
             int selectedRow = adminMenuTable.getSelectedRow();
             if (selectedRow >= 0) {
-                int confirm = JOptionPane.showConfirmDialog(this, "Voulez-vous vraiment supprimer ce plat ?", "Confirmation", JOptionPane.YES_NO_OPTION);
+                int confirm = JOptionPane.showConfirmDialog(this, 
+                        "Voulez-vous vraiment supprimer ce plat ?", 
+                        "Confirmation", JOptionPane.YES_NO_OPTION);
                 if (confirm == JOptionPane.YES_OPTION) {
                     Plat selectedPlat = menu.get(selectedRow);
                     if (DB.deletePlat(selectedPlat.getNom())) {
@@ -370,31 +374,16 @@ public class Admin extends JPanel {
                             categorySuggestions.remove(selectedPlat.getCategorie());
                         }
                         nameSuggestions.remove(selectedPlat.getNom());
-                        tableModel.removeRow(selectedRow);
-                        JOptionPane.showMessageDialog(this, "Plat supprimé avec succès !", "Succès", JOptionPane.INFORMATION_MESSAGE);
+                        refreshTable();
+                        showSuccess("Plat supprimé avec succès !");
                     } else {
-                        JOptionPane.showMessageDialog(this, "Erreur lors de la suppression du plat dans la base de données !", "Erreur", JOptionPane.ERROR_MESSAGE);
+                        showError("Erreur lors de la suppression du plat dans la base de données !");
                     }
                 }
             } else {
-                JOptionPane.showMessageDialog(this, "Sélectionnez un plat à supprimer !", "Erreur", JOptionPane.ERROR_MESSAGE);
+                showError("Sélectionnez un plat à supprimer !");
             }
         });
-
-        listUsersButton.addActionListener(e -> {
-            List<String> users = DB.listUsers();
-            if (users.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Aucun utilisateur trouvé dans la base de données.", "Information", JOptionPane.INFORMATION_MESSAGE);
-            } else {
-                StringBuilder userList = new StringBuilder("Utilisateurs :\n");
-                for (String user : users) {
-                    userList.append("- ").append(user).append("\n");
-                }
-                JOptionPane.showMessageDialog(this, userList.toString(), "Liste des Utilisateurs", JOptionPane.INFORMATION_MESSAGE);
-            }
-        });
-
-        backButtonAdmin.addActionListener(e -> cardLayout.show(cardPanel, "Home"));
 
         // Double-click table row to populate form
         adminMenuTable.addMouseListener(new MouseAdapter() {
@@ -408,14 +397,118 @@ public class Admin extends JPanel {
                         descField.setText((String) tableModel.getValueAt(selectedRow, 2));
                         catField.setText((String) tableModel.getValueAt(selectedRow, 3));
                         selectedImagePath = (String) tableModel.getValueAt(selectedRow, 4);
-                        imgPathLabel.setText(new File(selectedImagePath).getName()); // Show file name
-                        imgPathLabel.setToolTipText(selectedImagePath); // Full path in tooltip
+                        imgPathLabel.setText(new File(selectedImagePath).getName());
+                        imgPathLabel.setToolTipText(selectedImagePath);
                     }
                 }
             }
         });
+    }
 
-        add(backgroundPanel, BorderLayout.CENTER);
+    private JPanel createAdminSearchPanel() {
+        JPanel searchPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 10));
+        searchPanel.setOpaque(false);
+        searchPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
+        // Search Field
+        JTextField searchField = new JTextField(25);
+        searchField.setFont(new Font("Arial", Font.PLAIN, 14));
+        
+        // Search Options
+        String[] searchTypes = {"Tous", "Nom", "Catégorie", "Prix"};
+        JComboBox<String> searchTypeCombo = new JComboBox<>(searchTypes);
+        
+        // Search Button
+        JButton searchButton = new JButton("Rechercher");
+        styleButton(searchButton);
+        
+        // Clear Button
+        JButton clearButton = new JButton("Réinitialiser");
+        styleButton(clearButton, new Color(200, 200, 200));
+        
+        // Add components
+        searchPanel.add(new JLabel("Recherche: "));
+        searchPanel.add(searchField);
+        searchPanel.add(searchTypeCombo);
+        searchPanel.add(searchButton);
+        searchPanel.add(clearButton);
+        
+        // Search action
+        searchButton.addActionListener(e -> {
+            String query = searchField.getText().trim();
+            String type = (String)searchTypeCombo.getSelectedItem();
+            filterPlats(query, type);
+        });
+        
+        // Clear action
+        clearButton.addActionListener(e -> {
+            searchField.setText("");
+            filterPlats("", "Tous");
+        });
+        
+        return searchPanel;
+    }
+
+    private void filterPlats(String query, String type) {
+        List<Plat> filtered = new ArrayList<>();
+        
+        for (Plat plat : menu) {
+            boolean match = false;
+            
+            switch(type) {
+                case "Nom":
+                    match = plat.getNom().toLowerCase().contains(query.toLowerCase());
+                    break;
+                case "Catégorie":
+                    match = plat.getCategorie().toLowerCase().contains(query.toLowerCase());
+                    break;
+                case "Prix":
+                    try {
+                        double price = Double.parseDouble(query);
+                        match = plat.getPrix() <= price;
+                    } catch (NumberFormatException e) {
+                        // Invalid price - no match
+                    }
+                    break;
+                default: // "Tous"
+                    match = true;
+            }
+            
+            if (match) filtered.add(plat);
+        }
+        
+        updatePlatsTable(filtered);
+    }
+
+    private void updatePlatsTable(List<Plat> plats) {
+        tableModel.setRowCount(0);
+        for (Plat plat : plats) {
+            tableModel.addRow(new Object[]{
+                plat.getNom(), 
+                plat.getPrix(), 
+                plat.getDescription(), 
+                plat.getCategorie(), 
+                plat.getImagePath()
+            });
+        }
+    }
+
+    private void refreshTable() {
+        updatePlatsTable(menu);
+    }
+
+    private void showUserList() {
+        List<String> users = DB.listUsers();
+        if (users.isEmpty()) {
+            showInformation("Aucun utilisateur trouvé dans la base de données.");
+        } else {
+            StringBuilder userList = new StringBuilder("Utilisateurs :\n");
+            for (String user : users) {
+                userList.append("- ").append(user).append("\n");
+            }
+            JOptionPane.showMessageDialog(this, userList.toString(), 
+                    "Liste des Utilisateurs", JOptionPane.INFORMATION_MESSAGE);
+        }
     }
 
     private void styleButton(JButton button) {
@@ -447,4 +540,17 @@ public class Admin extends JPanel {
         selectedImagePath = "";
         imgPathLabel.setText("Aucune image sélectionnée");
         imgPathLabel.setToolTipText(null);
-    }}
+    }
+
+    private void showError(String message) {
+        JOptionPane.showMessageDialog(this, message, "Erreur", JOptionPane.ERROR_MESSAGE);
+    }
+
+    private void showSuccess(String message) {
+        JOptionPane.showMessageDialog(this, message, "Succès", JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    private void showInformation(String message) {
+        JOptionPane.showMessageDialog(this, message, "Information", JOptionPane.INFORMATION_MESSAGE);
+    }
+}

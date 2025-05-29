@@ -1,5 +1,9 @@
 package Ai;
-
+import DB.* ;
+import Vue.Plat;
+import Vue.SignIn;
+import java.util.List;
+import java.util.ArrayList;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -9,6 +13,7 @@ import java.net.URI;
 import java.nio.charset.StandardCharsets;
 
 public class FloatingChatIcon extends JPanel {
+    private  String oldConvesation   = "" ;
     private static final int ICON_SIZE = 60;
     private static final Color ICON_COLOR = new Color(33, 150, 243); // Modern blue
     private static final Color ICON_HOVER_COLOR = new Color(66, 165, 245); // Lighter blue on hover
@@ -320,15 +325,76 @@ public class FloatingChatIcon extends JPanel {
             dialog.setLocation(iconLocation.x - dialog.getWidth(), iconLocation.y - dialog.getHeight());
         }
 
+        public static String getMessagePlats() {
+    List<Plat> plats = DB.listPlats();
+    StringBuilder message = new StringBuilder("Liste des plats :\n");
+
+    for (Plat plat : plats) {
+        message.append("Nom : ").append(plat.getNom()).append("\n")
+               .append("Prix : ").append(plat.getPrix()).append(" DH\n")
+               .append("Description : ").append(plat.getDescription()).append("\n")
+               .append("Catégorie : ").append(plat.getCategorie()).append("\n")
+               .append("Image : ").append(plat.getImagePath()).append("\n")
+               .append("-----------------------------\n");
+    }
+
+    return message.toString();
+}
+
+        
+        
+        
+        
+        
         private void sendMessage() {
-            String message = messageField.getText().trim();
+            // make the chat bot in the contexte author youssef
+            
+             
+String msg = 
+    "You are Buvette ChatBot, a virtual assistant designed to help users with restaurant-related inquiries.\n"
+  + "Your creator is Youssef.\n\n"
+
+  + "Here is how you should answer certain questions:\n"
+  + "- If the user asks: \"How are you?\" → Reply: \"I am Buvette ChatBot, always ready to help!\"\n"
+  + "- If the user asks: \"Who made you?\" → Reply: \"I was created by Youssef.\"\n"
+  + "- If the user asks: \"Who is talking?\" → Reply with the user's info below.\n\n"
+
+  + "Here is the current user's information:\n"
+  + "- Name: " + SignIn.user.getName() + "\n"
+  + "- Email: " + SignIn.user.getEmail() + "\n"
+  + "- Password: " + SignIn.user.getPassword() + "\n\n"
+
+  + "Below is the full list of available dishes you can use to answer menu-related questions:\n"
+  + getMessagePlats() + "\n"
+
+  + "Use this information as your context to understand and respond to user messages appropriately." +
+
+"use this old conversation as your memory  " + oldConvesation ;
+        
+        
+        
+
+             
+           
+            
+            
+            
+            
+            String message =messageField.getText().trim();
+            oldConvesation = oldConvesation.concat("user  : " + message + ",") ;
+                    
             if (!message.isEmpty()) {
+                
                 addMessage("You", message);
                 messageField.setText("");
 
                 SwingUtilities.invokeLater(() -> {
                     try {
-                        String response = sendToGemini(message);
+                       String ContextePluseMessage  = msg.concat(message) ;
+                        System.out.println(ContextePluseMessage);
+                        System.out.println("Ai^ppppppppppppppppppppppppppppp");
+                        String response = sendToGemini(ContextePluseMessage);
+                        oldConvesation =oldConvesation.concat("chat bot  : " + response+ " ,") ;
                         addMessage("Gemini", response);
                     } catch (Exception e) {
                         addMessage("System", "Error communicating with Gemini API: " + e.getMessage());

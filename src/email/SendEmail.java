@@ -1,40 +1,53 @@
-package email ;
+package email;
 
-import com.sun.jdi.connect.Transport;
-import jakarta.mail.*;
-import jakarta.mail.internet.*;
-import java.net.Authenticator;
-import java.net.PasswordAuthentication;
-import java.util.Properties;
-import java.util.Timer;
-import java.util.TimerTask;
+import jakarta.mail.Authenticator;
+import jakarta.mail.Message;
+import jakarta.mail.MessagingException;
+import jakarta.mail.PasswordAuthentication;
+import jakarta.mail.Session;
+import jakarta.mail.Transport;
+import jakarta.mail.internet.InternetAddress;
+import jakarta.mail.internet.MimeMessage;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
+import java.util.Properties;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.concurrent.TimeUnit;
 
-/**
- * Service complet de notification email pour la buvette
- */
 public class SendEmail {
-
-    // Configuration SMTP
+    // Configuration SMTP (should be loaded from config file/environment)
     private static final String SMTP_HOST = "smtp.gmail.com";
     private static final int SMTP_PORT = 587;
-    private static final String SMTP_USERNAME = "najiy514@gmail.com";
-    private static final String SMTP_PASSWORD = "mfmm oxpp tfmg pdsj";
+    private static final String SMTP_USERNAME = System.getenv("EMAIL_USERNAME"); // Use environment variables
+    private static final String SMTP_PASSWORD = System.getenv("EMAIL_PASSWORD"); // Use environment variables
     
-    // Configuration des emails
-    private static final String DEFAULT_FROM = "najiy514@gmail.com";
-    private static final String DEFAULT_TO = "mustaphabennasser8@gmail.com";
+    // Email configuration
+    private static final String DEFAULT_FROM = System.getenv("EMAIL_FROM");
+    private static final String DEFAULT_TO = System.getenv("EMAIL_TO");
     private static final String DAILY_SUBJECT = "🆕 Rappel Quotidien Buvette";
     
     private Timer timer;
 
-    // Méthode pour l'envoi quotidien automatique
     public void startDailyNotifications() {
-        stopDailyNotifications(); // Arrêter si déjà en cours
+        stopDailyNotifications(); // Stop if already running
         
-        timer = new Timer("BuvetteEmailScheduler", true);
+        timer = new Timer("BuvetteEmailScheduler");
+        
+        // Calculate initial delay to next 8:00 AM
+        Calendar now = Calendar.getInstance();
+        Calendar nextRun = Calendar.getInstance();
+        nextRun.set(Calendar.HOUR_OF_DAY, 8);
+        nextRun.set(Calendar.MINUTE, 0);
+        nextRun.set(Calendar.SECOND, 0);
+        nextRun.set(Calendar.MILLISECOND, 0);
+        
+        if (now.after(nextRun)) {
+            nextRun.add(Calendar.DAY_OF_MONTH, 1);
+        }
+        
+        long initialDelay = nextRun.getTimeInMillis() - now.getTimeInMillis();
         
         timer.scheduleAtFixedRate(new TimerTask() {
             @Override
@@ -44,26 +57,29 @@ public class SendEmail {
                 
                 envoyerEmail(DEFAULT_TO, DAILY_SUBJECT, content);
             }
-        }, 0, 24 * 60 * 60 * 1000); // Toutes les 24h
+        }, initialDelay, TimeUnit.DAYS.toMillis(1)); // Every 24 hours
         
-        log("Service quotidien démarré. Prochain envoi dans 24h.");
+        log("Service quotidien démarré. Prochain envoi à " + nextRun.getTime());
     }
     
     public void stopDailyNotifications() {
         if (timer != null) {
             timer.cancel();
-            timer.purge();
+            timer = null;
             log("Service quotidien arrêté.");
         }
     }
 
-    // Méthode d'envoi d'email à la demande (version statique)
     public static void envoyerEmail(String destinataire, String email) {
         envoyerEmail(destinataire, "CHEK OUT THE NEW EXCITING THINGS", email);
     }
 
-    // Méthode d'envoi d'email générique
-    public static void envoyerEmail(String destinataire, String sujet, String email) {
+    public static void envoyerEmail(String destinataire, String sujet, String contenu) {
+        if (SMTP_USERNAME == null || SMTP_PASSWORD == null) {
+            logError("Les identifiants SMTP ne sont pas configurés");
+            return;
+        }
+
         Properties props = new Properties();
         props.put("mail.smtp.auth", "true");
         props.put("mail.smtp.starttls.enable", "true");
@@ -82,7 +98,7 @@ public class SendEmail {
             message.setFrom(new InternetAddress(DEFAULT_FROM));
             message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(destinataire));
             message.setSubject(sujet);
-            message.setText(email);
+            message.setText(contenu);
 
             Transport.send(message);
             log("Email envoyé à " + destinataire);
@@ -99,55 +115,24 @@ public class SendEmail {
     private static void logError(String message) {
         System.err.println("[BuvetteEmail-ERROR] " + LocalDateTime.now() + " - " + message);
     }
-    public void startDailyNotificationsAtSpecificTime(int hour, int minute) {
-    Timer timer = new Timer();
-    
-    // Calcul du délai jusqu'à la prochaine occurrence de l'heure cible
-    Calendar now = Calendar.getInstance();
-    Calendar target = Calendar.getInstance();
-    target.set(Calendar.HOUR_OF_DAY, hour);
-    target.set(Calendar.MINUTE, minute);
-    target.set(Calendar.SECOND, 0);
-    
-    if(now.after(target)) {
-        target.add(Calendar.DATE, 1);
-    }
-    
-    long delay = target.getTimeInMillis() - now.getTimeInMillis();
-    
-    timer.scheduleAtFixedRate(new TimerTask() {
-        @Override
-        public void run() {
-            String content = "Rappel quotidien - Vérifiez les nouveautés dans la buvette!";
-            envoyerEmail(DEFAULT_TO, DAILY_SUBJECT, content);
-        }
-    }, delay, 24 * 60 * 60 * 1000); // Répéter toutes les 24h
-}
-    
-    
-    
-    
-    
-    
-    
-    
 
     public static void main(String[] args) {
-        // Exemple d'utilisation
         SendEmail service = new SendEmail();
         
-        // 1. Démarrer le service quotidien
+        // Start daily notifications
         service.startDailyNotifications();
         
-        // 2. Envoyer un email immédiat (à la demande)
-        envoyerEmail("destinataire@example.com", "Contenu de test");
+        // Keep the program running (better than Thread.sleep)
+        Runtime.getRuntime().addShutdownHook(new Thread(service::stopDailyNotifications));
         
-        // Garder le programme en vie
-        try {
-            Thread.sleep(Long.MAX_VALUE);
-        } catch (InterruptedException e) {
-            service.stopDailyNotifications();
+        // Simple way to keep the program running
+        while (true) {
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                break;
+            }
         }
     }
 }
-

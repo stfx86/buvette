@@ -4,7 +4,6 @@
 import Ai.FloatingChatIcon;
 
 
-import Application.MainPrincipal;
 
 //import Application.MainPrincipal;
 
@@ -29,14 +28,17 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JScrollPane;
+import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 
 
@@ -254,70 +256,243 @@ public class BuvetteApp1 extends JFrame {
             }
         }
     }
+    /// search palats
+   private void searchPlats(String searchText) {
+    platsPanel.removeAll();
+    List<Plat> matchingPlats = new ArrayList<>();
 
-    private JPanel createHomePanel() {
-        BackgroundPanel backgroundPanel = new BackgroundPanel("src/images/py.png");
-        backgroundPanel.setLayout(new BorderLayout());
-          
-        JPanel contentPanel = new JPanel(new BorderLayout());
-        contentPanel.setOpaque(false);
-
-        JPanel headerPanel = new JPanel();
-        headerPanel.setLayout(new BoxLayout(headerPanel, BoxLayout.Y_AXIS));
-        headerPanel.setOpaque(false);
-/*
-        JButton adminButton = new JButton("Espace Administrateur");
-        adminButton.setPreferredSize(new Dimension(200, 50));
-        adminButton.setBackground(new Color(0, 153, 255));
-        adminButton.setForeground(Color.WHITE);
-        adminButton.setFont(new Font("Arial", Font.BOLD, 16));
-        adminButton.addActionListener(e -> {
-            System.out.println("Admin button clicked, switching to Login panel");
-            cardLayout.show(cardPanel, "Login");
-        });
-        adminButton.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseEntered(MouseEvent e) {
-                adminButton.setBackground(new Color(0, 120, 200));
+    // Search through all categories
+    for (List<Plat> plats : menuData.values()) {
+        for (Plat plat : plats) {
+            if (plat.getNom().toLowerCase().contains(searchText.toLowerCase()) ||
+                plat.getDescription().toLowerCase().contains(searchText.toLowerCase())) {
+                matchingPlats.add(plat);
             }
-
-            @Override
-            public void mouseExited(MouseEvent e) {
-                adminButton.setBackground(new Color(0, 153, 255));
-            }
-        });
-        
-        */
-        //JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        JPanel topPanel = new JPanel(new WrapLayout(FlowLayout.LEFT));
-        topPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 200)); // or desired height// or RIGH  
-        
-        topPanel.setOpaque(false);
-        //topPanel.add(adminButton);
-        headerPanel.add(topPanel);
-
-        JPanel categoriesPanel = createCategoryButtons();
-        headerPanel.add(categoriesPanel);
-
-        contentPanel.add(headerPanel, BorderLayout.NORTH);
-
-        platsPanel = new JPanel(new WrapLayout(FlowLayout.LEFT, 20, 20));
-        platsPanel.setOpaque(false);
-
-        JScrollPane scrollPane = new JScrollPane(platsPanel);
-        scrollPane.setOpaque(false);
-        scrollPane.getViewport().setOpaque(false);
-        scrollPane.setBorder(null);
-        scrollPane.getVerticalScrollBar().setUnitIncrement(16);
-        contentPanel.add(scrollPane, BorderLayout.CENTER);
-
-        backgroundPanel.add(contentPanel, BorderLayout.CENTER);
-
-        displayPlats("Pizzas");
-
-        return backgroundPanel;
+        }
     }
 
+    if (matchingPlats.isEmpty()) {
+        platsPanel.add(new JLabel("Aucun plat trouvé pour: " + searchText));
+    } else {
+        for (Plat plat : matchingPlats) {
+            JPanel card = PlatCardCreator.createPlatCard(plat, new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    System.out.println(".platt added");
+                    panierPanel.addPlat(plat);
+                }
+            });
+            platsPanel.add(card);
+        }
+    }
+
+    platsPanel.revalidate();
+    platsPanel.repaint();
+}
+    
+   
+   
+   
+   
+   
+   
+   private JPanel createCompactSearchPanel() {
+    JPanel searchPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
+    searchPanel.setOpaque(false);
+    
+    // Search Field with styling
+    JTextField searchField = new JTextField(20);
+    searchField.setFont(new Font("Arial", Font.PLAIN, 14));
+    searchField.setBorder(BorderFactory.createCompoundBorder(
+        BorderFactory.createLineBorder(new Color(0, 153, 255)),
+        BorderFactory.createEmptyBorder(5, 10, 5, 10)
+    ));
+    
+    // Search Options Combo Box
+    String[] searchTypes = {"Nom", "Catégorie", "Prix ≤"};
+    JComboBox<String> searchTypeCombo = new JComboBox<>(searchTypes);
+    searchTypeCombo.setBackground(Color.WHITE);
+    searchTypeCombo.setFont(new Font("Arial", Font.PLAIN, 14));
+    
+    // Search Button with styling
+    JButton searchButton = new JButton("🔍");
+    searchButton.setFont(new Font("Arial", Font.PLAIN, 16));
+    searchButton.setBackground(new Color(0, 153, 255));
+    searchButton.setForeground(Color.WHITE);
+    searchButton.setBorder(BorderFactory.createEmptyBorder(5, 15, 5, 15));
+    searchButton.setFocusPainted(false);
+    
+    // Hover effects
+    searchButton.addMouseListener(new MouseAdapter() {
+        @Override
+        public void mouseEntered(MouseEvent e) {
+            searchButton.setBackground(new Color(0, 120, 200));
+        }
+        @Override
+        public void mouseExited(MouseEvent e) {
+            searchButton.setBackground(new Color(0, 153, 255));
+        }
+    });
+    
+    // Add components
+    searchPanel.add(searchField);
+    searchPanel.add(searchTypeCombo);
+    searchPanel.add(searchButton);
+    
+    // Search action
+    ActionListener searchAction = e -> {
+        String searchText = searchField.getText().trim();
+        String searchType = (String) searchTypeCombo.getSelectedItem();
+        
+        if (searchText.isEmpty() && !searchType.equals("Prix ≤")) {
+            displayPlats("Pizzas");
+            return;
+        }
+        
+        switch (searchType) {
+            case "Nom":
+                searchByName(searchText);
+                break;
+            case "Catégorie":
+                searchByCategory(searchText);
+                break;
+            case "Prix ≤":
+                try {
+                    int maxPrice = Integer.parseInt(searchText);
+                    searchByPrice(maxPrice);
+                } catch (NumberFormatException ex) {
+                    JOptionPane.showMessageDialog(BuvetteApp1.this, 
+                        "Veuillez entrer un prix valide", 
+                        "Erreur", 
+                        JOptionPane.ERROR_MESSAGE);
+                }
+                break;
+        }
+    };
+    
+    searchButton.addActionListener(searchAction);
+    searchField.addActionListener(searchAction);
+    
+    return searchPanel;
+}
+
+private void searchByName(String name) {
+    List<Plat> matchingPlats = new ArrayList<>();
+    for (List<Plat> plats : menuData.values()) {
+        for (Plat plat : plats) {
+            if (plat.getNom().toLowerCase().contains(name.toLowerCase())) {
+                matchingPlats.add(plat);
+            }
+        }
+    }
+    displaySearchResults(matchingPlats);
+}
+
+private void searchByCategory(String category) {
+    List<Plat> matchingPlats = new ArrayList<>();
+    for (Map.Entry<String, List<Plat>> entry : menuData.entrySet()) {
+        if (entry.getKey().equalsIgnoreCase(category)) {
+            matchingPlats.addAll(entry.getValue());
+            break;
+        }
+    }
+    
+    // If no exact match, do partial matching
+    if (matchingPlats.isEmpty()) {
+        for (Map.Entry<String, List<Plat>> entry : menuData.entrySet()) {
+            if (entry.getKey().toLowerCase().contains(category.toLowerCase())) {
+                matchingPlats.addAll(entry.getValue());
+            }
+        }
+    }
+    
+    displaySearchResults(matchingPlats);
+}
+
+private void searchByPrice(int maxPrice) {
+    List<Plat> matchingPlats = new ArrayList<>();
+    for (List<Plat> plats : menuData.values()) {
+        for (Plat plat : plats) {
+            if (plat.getPrix() <= maxPrice) {
+                matchingPlats.add(plat);
+            }
+        }
+    }
+    displaySearchResults(matchingPlats);
+}
+
+private void displaySearchResults(List<Plat> plats) {
+    platsPanel.removeAll();
+    
+    if (plats.isEmpty()) {
+        JLabel noResults = new JLabel("Aucun résultat trouvé");
+        noResults.setFont(new Font("Arial", Font.ITALIC, 14));
+        noResults.setForeground(Color.GRAY);
+        platsPanel.add(noResults);
+    } else {
+        for (Plat plat : plats) {
+            JPanel card = PlatCardCreator.createPlatCard(plat, e -> {
+                panierPanel.addPlat(plat);
+            });
+            platsPanel.add(card);
+        }
+    }
+    
+    platsPanel.revalidate();
+    platsPanel.repaint();
+}
+   
+   
+   
+   
+   
+   
+   
+   
+    
+    
+    
+    
+    
+private JPanel createHomePanel() {
+    BackgroundPanel backgroundPanel = new BackgroundPanel("src/images/py.png");
+    backgroundPanel.setLayout(new BorderLayout());
+      
+    JPanel contentPanel = new JPanel(new BorderLayout());
+    contentPanel.setOpaque(false);
+
+    // Create main container
+    JPanel topContainer = new JPanel();
+    topContainer.setLayout(new BoxLayout(topContainer, BoxLayout.Y_AXIS));
+    topContainer.setOpaque(false);
+    topContainer.setBorder(BorderFactory.createEmptyBorder(10, 10, 20, 10));
+
+    // Add compact search panel
+    topContainer.add(createCompactSearchPanel());
+    
+    // Add categories panel
+    topContainer.add(createCategoryButtons());
+
+    contentPanel.add(topContainer, BorderLayout.NORTH);
+
+    // Create plats panel with scroll
+    platsPanel = new JPanel(new WrapLayout(FlowLayout.LEFT, 20, 20));
+    platsPanel.setOpaque(false);
+
+    JScrollPane scrollPane = new JScrollPane(platsPanel);
+    scrollPane.setOpaque(false);
+    scrollPane.getViewport().setOpaque(false);
+    scrollPane.setBorder(null);
+    scrollPane.getVerticalScrollBar().setUnitIncrement(16);
+    contentPanel.add(scrollPane, BorderLayout.CENTER);
+
+    backgroundPanel.add(contentPanel, BorderLayout.CENTER);
+
+    // Show default category
+    displayPlats("Pizzas");
+
+    return backgroundPanel;
+}
     private JPanel createCategoryButtons() {
         JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 20));
         panel.setOpaque(false);
