@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 public class DB {
 
@@ -354,9 +355,12 @@ public class DB {
                 "Cordialement,\nL'équipe de la Buvette" ;
             
             
-            email.SendEmail.envoyerEmail(em , Email) ;
+           
                 
-                
+                CompletableFuture.runAsync(() -> {
+                     email.SendEmail.envoyerEmail(em , Email) ;
+  
+        });
            
         }
         
@@ -464,24 +468,61 @@ public static Map<String, String> getUsersEmailsWithNames() {
     
     
      public static boolean updatePlat(Plat oldPlat, Plat newPlat) {
-        String sql = "UPDATE buvette.plat SET nom = ?, prix = ?, descrp = ?, cat = ?, image = ? WHERE nom = ?";
-        try (Connection conn = connect(); PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setString(1, newPlat.getNom());
-            stmt.setDouble(2, newPlat.getPrix());
-            stmt.setString(3, newPlat.getDescription());
-            stmt.setString(4, newPlat.getCategorie());
-            stmt.setString(5, newPlat.getImagePath());
-            stmt.setString(6, oldPlat.getNom());
-            int rowsAffected = stmt.executeUpdate();
-            return rowsAffected > 0;
-        } catch (SQLException e) {
-            System.out.println("Error updating plat:");
-            e.printStackTrace();
-            return false;
-        }
+    StringBuilder sql = new StringBuilder("UPDATE buvette.plat SET ");
+    List<Object> values = new ArrayList<>();
+
+    // Vérifie les champs à mettre à jour
+    boolean changed = false;
+
+    if (newPlat.getNom() != null && !newPlat.getNom().equals(oldPlat.getNom())) {
+        sql.append("nom = ?, ");
+        values.add(newPlat.getNom());
+        changed = true;
     }
-    
-    
+    if (newPlat.getPrix() != oldPlat.getPrix()) {
+        sql.append("prix = ?, ");
+        values.add(newPlat.getPrix());
+        changed = true;
+    }
+    if (newPlat.getDescription() != null && !newPlat.getDescription().equals(oldPlat.getDescription())) {
+        sql.append("descrp = ?, ");
+        values.add(newPlat.getDescription());
+        changed = true;
+    }
+    if (newPlat.getCategorie() != null && !newPlat.getCategorie().equals(oldPlat.getCategorie())) {
+        sql.append("cat = ?, ");
+        values.add(newPlat.getCategorie());
+        changed = true;
+    }
+    if (newPlat.getImagePath() != null && !newPlat.getImagePath().equals(oldPlat.getImagePath())) {
+        sql.append("image = ?, ");
+        values.add(newPlat.getImagePath());
+        changed = true;
+    }
+
+    if (!changed) {
+        System.out.println("Aucun changement détecté.");
+        return false;
+    }
+
+    // Supprimer la virgule finale
+    sql.setLength(sql.length() - 2);
+    sql.append(" WHERE nom = ?");
+    values.add(oldPlat.getNom()); // old key value (important!)
+
+    try (Connection conn = connect(); PreparedStatement stmt = conn.prepareStatement(sql.toString())) {
+        for (int i = 0; i < values.size(); i++) {
+            stmt.setObject(i + 1, values.get(i));
+        }
+        int rowsAffected = stmt.executeUpdate();
+        return rowsAffected > 0;
+    } catch (SQLException e) {
+        System.out.println("Erreur lors de la mise à jour du plat :");
+        e.printStackTrace();
+        return false;
+    }
+}
+
     
     
     

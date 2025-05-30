@@ -118,11 +118,17 @@ public void getHomebtn(JButton logoutBtn) {
 
         // Initialize navigation buttons
         homeBtn = createNavButton("Accueil", "🏠");
+        homeBtn.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 16));
         adminBtn = createNavButton("Admin", "🔒");
+        adminBtn.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 16));
         panierBtn = createNavButton("Panier", "🛒");
+        panierBtn.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 16));
         profileBtn = createNavButton("Profil", "👤");
+        profileBtn.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 16));
         settingsBtn = createNavButton("Paramètres", "⚙️");
+        settingsBtn.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 16));
         logoutBtn = createNavButton("Déconnexion", "🚪");
+        logoutBtn.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 16));
 
         // Add buttons to panel with spacing
         add(homeBtn);

@@ -20,13 +20,13 @@ public class SendEmail {
     // Configuration SMTP (should be loaded from config file/environment)
     private static final String SMTP_HOST = "smtp.gmail.com";
     private static final int SMTP_PORT = 587;
-    private static final String SMTP_USERNAME = System.getenv("EMAIL_USERNAME"); // Use environment variables
-    private static final String SMTP_PASSWORD = System.getenv("EMAIL_PASSWORD"); // Use environment variables
+    private static final String SMTP_USERNAME = "najiy514@gmail.com";
+    private static final String SMTP_PASSWORD = "mfmm oxpp tfmg pdsj";
     
-    // Email configuration
-    private static final String DEFAULT_FROM = System.getenv("EMAIL_FROM");
-    private static final String DEFAULT_TO = System.getenv("EMAIL_TO");
-    private static final String DAILY_SUBJECT = "🆕 Rappel Quotidien Buvette";
+    // Configuration des emails
+    private static final String DEFAULT_FROM = "najiy514@gmail.com";
+    private static final String DEFAULT_TO = "mustaphabennasser8@gmail.com";
+    private static final String DAILY_SUBJECT = "🆕 Rappel Quotidien Buvette";
     
     private Timer timer;
 
@@ -86,6 +86,7 @@ public class SendEmail {
         props.put("mail.smtp.host", SMTP_HOST);
         props.put("mail.smtp.port", SMTP_PORT);
         props.put("mail.smtp.ssl.protocols", "TLSv1.2");
+        System.out.println("i'm the one");
 
         Session session = Session.getInstance(props, new Authenticator() {
             protected PasswordAuthentication getPasswordAuthentication() {
@@ -99,7 +100,7 @@ public class SendEmail {
             message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(destinataire));
             message.setSubject(sujet);
             message.setText(contenu);
-
+              
             Transport.send(message);
             log("Email envoyé à " + destinataire);
 
