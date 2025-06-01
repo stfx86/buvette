@@ -1,0 +1,141 @@
+# Cahier des Charges – Application de Gestion de Buvette
+
+## 1. Présentation Générale
+
+L'application « Buvette » est un système de gestion de buvette développé en Java (Swing), permettant la gestion des plats, des utilisateurs, des ventes et des stocks. Elle vise à faciliter l'administration d'un point de restauration rapide (buvette, snack, cantine, etc.) via une interface graphique conviviale.
+
+## 2. Objectifs
+
+- Permettre la gestion complète du menu (ajout, modification, suppression de plats)
+- Gérer les utilisateurs (authentification, rôles, gestion des comptes)
+- Suivre les ventes, mouvements de stock, entrées et sorties de produits
+- Offrir une interface graphique moderne et intuitive pour les administrateurs et utilisateurs
+
+## 3. Fonctionnalités
+
+### 3.1 Gestion des Plats
+- Ajout, modification, suppression de plats (nom, prix, description, catégorie, image)
+- Recherche et filtrage des plats par nom, catégorie ou prix
+- Visualisation du menu par catégories (pizzas, burgers, desserts, boissons, etc.)
+- Import d'images de plats via fichier local ou URL
+
+### 3.2 Gestion des Utilisateurs
+- Authentification (login, mot de passe)
+- Gestion des comptes utilisateurs (création, modification, suppression)
+- Attribution de rôles (admin, utilisateur simple)
+- Visualisation de la liste des utilisateurs
+
+### 3.3 Gestion des Stocks et Ventes
+- Suivi des entrées (bons d'entrée) et sorties (bons de sortie) de produits
+- Gestion des ventes (factures, mouvements, historique)
+- Affichage des stocks en temps réel
+
+### 3.4 Interface Graphique
+- Application Java Swing avec navigation par panneaux (CardLayout)
+- Tableaux dynamiques pour l'affichage des plats, utilisateurs, mouvements, etc.
+- Formulaires d'ajout/modification avec validation des champs
+- Messages d'erreur, de succès et d'information contextuels
+
+## 4. Architecture Technique
+
+- **Langage** : Java
+- **Interface** : Swing (JFrame, JPanel, JTable, etc.)
+- **Base de données** : MySQL (ou compatible, via JDBC)
+- **Organisation** : 
+  - `src/Vue` : interfaces graphiques (Admin, Home, Login, etc.)
+  - `src/DB` : gestion de la base de données (requêtes, connexion)
+  - `src/Application` : logique applicative principale
+  - `src/images` : ressources graphiques (images des plats, fonds, etc.)
+
+## 5. Contraintes
+
+- Application 100% Java (pas de dépendances externes lourdes)
+- Interface ergonomique, adaptée à une utilisation sur PC
+- Sécurité basique (authentification, gestion des accès)
+- Stockage des images en local ou via URL
+
+## 6. Public Cible
+
+- Administrateurs de buvette ou snack
+- Utilisateurs responsables de la gestion des stocks et ventes
+
+## 7. Évolutions Possibles
+
+- Ajout d'un module de statistiques (ventes, stocks, etc.)
+- Export des données (PDF, Excel)
+- Gestion multi-utilisateurs avancée (droits, logs)
+- Version web ou mobile
+
+## 8. Détails Techniques
+
+### 8.1 Structure des Données
+
+#### Plat
+- Nom
+- Prix
+- Description
+- Catégorie
+- Chemin de l'image
+
+#### Utilisateur
+- Nom d'utilisateur
+- Mot de passe
+- Type (admin/utilisateur)
+- Email
+
+#### Vente
+- Numéro de facture
+- Date
+- Produits
+- Montant total
+
+### 8.2 Interfaces Principales
+
+#### Interface d'Administration
+- Gestion des plats
+- Gestion des utilisateurs
+- Suivi des ventes
+- Gestion des stocks
+
+#### Interface Utilisateur
+- Visualisation du menu
+- Recherche de plats
+- Gestion du panier
+- Historique des commandes
+
+### 8.3 Sécurité
+
+- Authentification des utilisateurs
+- Gestion des droits d'accès
+- Protection des données sensibles
+- Journalisation des actions importantes
+
+## 9. Planning de Développement
+
+### Phase 1 : Mise en Place
+- Configuration de l'environnement de développement
+- Création de la base de données
+- Développement des interfaces de base
+
+### Phase 2 : Développement des Fonctionnalités
+- Implémentation de la gestion des plats
+- Implémentation de la gestion des utilisateurs
+- Développement du système de vente
+
+### Phase 3 : Tests et Optimisation
+- Tests fonctionnels
+- Tests de performance
+- Correction des bugs
+- Optimisation de l'interface
+
+### Phase 4 : Déploiement
+- Installation sur les postes clients
+- Formation des utilisateurs
+- Mise en production
+
+## 10. Maintenance
+
+- Mises à jour régulières
+- Support technique
+- Sauvegarde des données
+- Documentation technique et utilisateur 

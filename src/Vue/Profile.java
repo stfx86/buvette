@@ -23,7 +23,6 @@ public class Profile extends JPanel {
     private JButton changePasswordBtn;
     private JButton changeEmailBtn;
     private JButton saveChangesBtn;
-    private BackgroundPanel backgroundPanel;
     private JPanel contentPanel;
    
     /**
@@ -32,10 +31,7 @@ public class Profile extends JPanel {
     public Profile() {
         setLayout(new BorderLayout());
         setOpaque(false);
-        
-        // Create background panel with image
-        backgroundPanel = new BackgroundPanel("src/images/py.png");
-        backgroundPanel.setLayout(new BorderLayout());
+        setBackground(new Color(30, 35, 50)); // Dark background
         
         // Create content panel with modern card-like appearance
         contentPanel = new JPanel() {
@@ -43,7 +39,7 @@ public class Profile extends JPanel {
             protected void paintComponent(Graphics g) {
                 Graphics2D g2 = (Graphics2D) g.create();
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                g2.setColor(new Color(30, 35, 50, 220)); // Semi-transparent dark
+                g2.setColor(new Color(40, 45, 60)); // Slightly lighter background
                 g2.fillRoundRect(0, 0, getWidth(), getHeight(), 25, 25);
                 g2.dispose();
             }
@@ -57,11 +53,8 @@ public class Profile extends JPanel {
         setupLayout();
         setupListeners();
         
-        // Add content panel to background
-        backgroundPanel.add(contentPanel, BorderLayout.CENTER);
-        
-        // Add background to main panel
-        add(backgroundPanel, BorderLayout.CENTER);
+        // Add content panel to main panel
+        add(contentPanel, BorderLayout.CENTER);
     }
 
     /**
@@ -87,31 +80,25 @@ public class Profile extends JPanel {
         Color buttonBg = new Color(70, 130, 180); // Steel blue
         Color buttonFg = Color.WHITE;
         
-        // Create styled buttons
+        // Create styled buttons with system icons
         changeNameBtn = createModernButton("Edit Name", buttonFont, buttonBg, buttonFg);
         changePasswordBtn = createModernButton("Change Password", buttonFont, buttonBg, buttonFg);
         changeEmailBtn = createModernButton("Edit Email", buttonFont, buttonBg, buttonFg);
         saveChangesBtn = createModernButton("Save Profile", buttonFont, new Color(50, 150, 100), Color.WHITE); // Green for save
         
-        // Add icons to buttons if available
-        try {
-            changeNameBtn.setIcon(new ImageIcon(getClass().getResource("/icons/edit.png")));
-            changePasswordBtn.setIcon(new ImageIcon(getClass().getResource("/icons/lock.png")));
-            changeEmailBtn.setIcon(new ImageIcon(getClass().getResource("/icons/email.png")));
-            saveChangesBtn.setIcon(new ImageIcon(getClass().getResource("/icons/save.png")));
-        } catch (Exception e) {
-            System.out.println("Icons not found, proceeding without them");
-        }
+        // Set icons using system defaults
+        changeNameBtn.setIcon(new TextIcon("✏", buttonFont, buttonFg)); // Pencil icon
+         changeNameBtn.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 16));
+        changePasswordBtn.setIcon(new TextIcon("🔒", buttonFont, buttonFg)); // Lock icon
+         changePasswordBtn.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 16));
+        changeEmailBtn.setIcon(new TextIcon("✉", buttonFont, buttonFg)); // Envelope icon
+         changeEmailBtn.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 16));
+        saveChangesBtn.setIcon(new TextIcon("💾", buttonFont, Color.WHITE)); // Floppy disk icon
+        saveChangesBtn.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 16));
     }
     
     /**
      * Creates a modern styled button with rounded corners and hover effects
-     * 
-     * @param text Button text
-     * @param font Button font
-     * @param bg Background color
-     * @param fg Foreground (text) color
-     * @return Styled JButton
      */
     private JButton createModernButton(String text, Font font, Color bg, Color fg) {
         JButton button = new JButton(text) {
@@ -120,7 +107,6 @@ public class Profile extends JPanel {
                 Graphics2D g2 = (Graphics2D) g.create();
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                 
-                // Different colors for pressed and hover states
                 if (getModel().isPressed()) {
                     g2.setColor(bg.darker());
                 } else if (getModel().isRollover()) {
@@ -129,7 +115,6 @@ public class Profile extends JPanel {
                     g2.setColor(bg);
                 }
                 
-                // Draw rounded rectangle background
                 g2.fillRoundRect(0, 0, getWidth(), getHeight(), 15, 15);
                 g2.dispose();
                 
@@ -142,7 +127,6 @@ public class Profile extends JPanel {
             }
         };
         
-        // Set button properties
         button.setFont(font);
         button.setForeground(fg);
         button.setContentAreaFilled(false);
@@ -231,7 +215,6 @@ public class Profile extends JPanel {
 
     /**
      * Handles name change action
-     * @param e Action event
      */
     private void changeNameAction(ActionEvent e) {
         String newName = showModernInputDialog("Edit Name", "Enter your new name:", SignIn.user.getName());
@@ -243,25 +226,20 @@ public class Profile extends JPanel {
 
     /**
      * Handles password change action with validation
-     * @param e Action event
      */
     private void changePasswordAction(ActionEvent e) {
-        // Create password change dialog
         JPanel panel = new JPanel(new GridLayout(0, 1, 10, 10));
         panel.setBorder(new EmptyBorder(15, 15, 15, 15));
         panel.setOpaque(false);
         
-        // Password fields
         JPasswordField currentPass = new JPasswordField();
         JPasswordField newPass = new JPasswordField();
         JPasswordField confirmPass = new JPasswordField();
         
-        // Add fields to panel
         panel.add(createInputField("Current Password:", currentPass));
         panel.add(createInputField("New Password:", newPass));
         panel.add(createInputField("Confirm New Password:", confirmPass));
         
-        // Show dialog
         int result = JOptionPane.showOptionDialog(
             this, 
             panel, 
@@ -273,89 +251,69 @@ public class Profile extends JPanel {
             "Change Password");
         
         if (result == JOptionPane.OK_OPTION) {
-            // Get password values
             String currentPassStr = new String(currentPass.getPassword());
             String newPassStr = new String(newPass.getPassword());
             String confirmPassStr = new String(confirmPass.getPassword());
 
-            // Validate current password
             if (!currentPassStr.equals(SignIn.user.getPassword())) {
                 showErrorDialog("Current password is incorrect!");
                 return;
             }
 
-            // Validate new password match
             if (!newPassStr.equals(confirmPassStr)) {
                 showErrorDialog("New passwords do not match!");
                 return;
             }
 
-            // Validate password not empty
             if (newPassStr.trim().isEmpty()) {
                 showErrorDialog("New password cannot be empty!");
                 return;
             }
 
-            // Update password
             SignIn.user.setPassword(newPassStr);
             showSuccessDialog("Password changed successfully!");
-            
-            // Update in database
             DB.changePassword(SignIn.user.getName(), newPassStr);
         }
     }
 
     /**
      * Handles email change action
-     * @param e Action event
      */
     private void changeEmailAction(ActionEvent e) {
         String currentEmail = SignIn.user.getEmail() != null ? SignIn.user.getEmail() : "";
         String newEmail = showModernInputDialog("Edit Email", "Enter your new email:", currentEmail);
         if (newEmail != null && !newEmail.trim().isEmpty()) {
             SignIn.user.setEmail(newEmail);
-            System.out.println(SignIn.user.getEmail());
             DB.updateEmail(SignIn.user.getName(), SignIn.user.getEmail());
-            System.out.println("email modifie ");
             emailLabel.setText("Email: " + newEmail);
         }
     }
 
     /**
      * Handles save changes action
-     * @param e Action event
      */
     private void saveChangesAction(ActionEvent e) {
-        // Save all changes to database
         DB.updateUserInformation(
             SignIn.user.getName(), 
             SignIn.user.getName(),
             SignIn.user.getPassword(), 
             SignIn.user.getEmail()
         );
-        
         showSuccessDialog("Profile changes saved successfully!");
     }
     
     /**
      * Creates a modern styled input dialog
-     * 
-     * @param title Dialog title
-     * @param message Dialog message
-     * @param initialValue Initial value in input field
-     * @return User input or null if canceled
      */
     private String showModernInputDialog(String title, String message, String initialValue) {
         JPanel panel = new JPanel(new BorderLayout(10, 10));
         panel.setBorder(new EmptyBorder(10, 10, 10, 10));
         panel.setOpaque(false);
         
-        // Create label
         JLabel label = new JLabel(message);
         label.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         label.setForeground(Color.WHITE);
         
-        // Create styled text field
         JTextField textField = new JTextField(initialValue);
         textField.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         textField.setBorder(BorderFactory.createCompoundBorder(
@@ -366,7 +324,6 @@ public class Profile extends JPanel {
         panel.add(label, BorderLayout.NORTH);
         panel.add(textField, BorderLayout.CENTER);
         
-        // Show dialog
         int result = JOptionPane.showOptionDialog(
             this, 
             panel, 
@@ -385,21 +342,15 @@ public class Profile extends JPanel {
     
     /**
      * Creates an input field with label
-     * 
-     * @param labelText Label text
-     * @param field Input field component
-     * @return Panel containing label and field
      */
     private JPanel createInputField(String labelText, JComponent field) {
         JPanel panel = new JPanel(new BorderLayout(5, 5));
         panel.setOpaque(false);
         
-        // Create label
         JLabel label = new JLabel(labelText);
         label.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         label.setForeground(Color.WHITE);
         
-        // Style the input field
         field.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         if (field instanceof JTextField) {
             ((JTextField)field).setBorder(BorderFactory.createCompoundBorder(
@@ -416,7 +367,6 @@ public class Profile extends JPanel {
     
     /**
      * Shows an error dialog
-     * @param message Error message to display
      */
     private void showErrorDialog(String message) {
         JOptionPane.showMessageDialog(
@@ -428,7 +378,6 @@ public class Profile extends JPanel {
     
     /**
      * Shows a success dialog
-     * @param message Success message to display
      */
     private void showSuccessDialog(String message) {
         JOptionPane.showMessageDialog(
@@ -440,11 +389,46 @@ public class Profile extends JPanel {
 
     /**
      * Sets user data to display in the profile
-     * @param name User name
-     * @param email User email
      */
     public void setUserData(String name, String email) {
         nameLabel.setText("Name: " + name);
         emailLabel.setText("Email: " + email);
+    }
+    
+    /**
+     * TextIcon class for rendering Unicode characters as icons
+     */
+    private static class TextIcon implements Icon {
+        private final String text;
+        private final Font font;
+        private final Color color;
+        
+        public TextIcon(String text, Font font, Color color) {
+            this.text = text;
+            this.font = font;
+            this.color = color;
+        }
+        
+        @Override
+        public void paintIcon(Component c, Graphics g, int x, int y) {
+            Graphics2D g2 = (Graphics2D) g.create();
+            g2.setFont(font);
+            g2.setColor(color);
+            FontMetrics fm = g2.getFontMetrics();
+            int textX = x + (getIconWidth() - fm.stringWidth(text)) / 2;
+            int textY = y + ((getIconHeight() - fm.getHeight()) / 2) + fm.getAscent();
+            g2.drawString(text, textX, textY);
+            g2.dispose();
+        }
+        
+        @Override
+        public int getIconWidth() {
+            return font.getSize() + 4;
+        }
+        
+        @Override
+        public int getIconHeight() {
+            return font.getSize() + 4;
+        }
     }
 }
