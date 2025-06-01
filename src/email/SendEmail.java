@@ -20,8 +20,8 @@ public class SendEmail {
     // Configuration SMTP (should be loaded from config file/environment)
     private static final String SMTP_HOST = "smtp.gmail.com";
     private static final int SMTP_PORT = 587;
-    private static final String SMTP_USERNAME = "najiy514@gmail.com";
-    private static final String SMTP_PASSWORD = "mfmm oxpp tfmg pdsj";
+    private static final String SMTP_USERNAME = "yourEmail@gmail.com";
+    private static final String SMTP_PASSWORD = "Yourpassword";
     
     // Configuration des emails
     private static final String DEFAULT_FROM = "najiy514@gmail.com";
