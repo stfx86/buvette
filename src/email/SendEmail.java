@@ -24,9 +24,9 @@ public class SendEmail {
     private static final String SMTP_PASSWORD = "Yourpassword";
     
     // Configuration des emails
-    private static final String DEFAULT_FROM = "najiy514@gmail.com";
-    private static final String DEFAULT_TO = "mustaphabennasser8@gmail.com";
-    private static final String DAILY_SUBJECT = "🆕 Rappel Quotidien Buvette";
+    private static final String DEFAULT_FROM = "";
+    private static final String DEFAULT_TO = "";
+    private static final String DAILY_SUBJECT = "🆕 Ra";
     
     private Timer timer;
 
