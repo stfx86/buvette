@@ -2,7 +2,7 @@ buvette
 
 GitHub Repo
 
-A Java project maintained by stfx86.
+A Java project maintained by  nj-ysf and stfx86 .
 🚀 Overview
 
 buvette is a Java-based project.
